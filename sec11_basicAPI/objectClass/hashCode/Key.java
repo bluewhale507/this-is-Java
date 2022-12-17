@@ -1,4 +1,4 @@
-package sec11_basicAPI.hashCode;
+package sec11_basicAPI.objectClass.hashCode;
 
 public class Key {
     public int number;

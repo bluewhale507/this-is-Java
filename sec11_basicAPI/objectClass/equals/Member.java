@@ -1,4 +1,4 @@
-package sec11_basicAPI.equals;
+package sec11_basicAPI.objectClass.equals;
 
 public class Member {
     public String id;

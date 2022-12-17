@@ -1,4 +1,4 @@
-package sec11_basicAPI.toString;
+package sec11_basicAPI.objectClass.toString;
 
 public class SmartPhoneExample {
     public static void main(String[] args) {

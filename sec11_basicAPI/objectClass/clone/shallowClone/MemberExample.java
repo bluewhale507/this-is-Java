@@ -1,6 +1,4 @@
-package sec11_basicAPI.clone.shallowClone;
-
-import sec11_basicAPI.clone.shallowClone.Member;
+package sec11_basicAPI.objectClass.clone.shallowClone;
 
 public class MemberExample {
     public static void main(String[] args) {

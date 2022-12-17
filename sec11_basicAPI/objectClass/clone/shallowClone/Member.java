@@ -1,4 +1,4 @@
-package sec11_basicAPI.clone.shallowClone;
+package sec11_basicAPI.objectClass.clone.shallowClone;
 
 public class Member implements Cloneable {
     public String id;

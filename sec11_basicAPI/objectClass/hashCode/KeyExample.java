@@ -1,4 +1,4 @@
-package sec11_basicAPI.hashCode;
+package sec11_basicAPI.objectClass.hashCode;
 
 import java.util.HashMap;
 

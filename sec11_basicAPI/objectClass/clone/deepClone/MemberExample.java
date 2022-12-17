@@ -1,4 +1,4 @@
-package sec11_basicAPI.clone.deepClone;
+package sec11_basicAPI.objectClass.clone.deepClone;
 
 public class MemberExample {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package sec11_basicAPI.equals;
+package sec11_basicAPI.objectClass.equals;
 
 public class MemberExample {
     public static void main(String[] args) {
