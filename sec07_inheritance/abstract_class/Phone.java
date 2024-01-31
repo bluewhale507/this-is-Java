@@ -1,6 +1,10 @@
 package sec07_inheritance.abstract_class;
 
-public abstract class Phone {
+import org.w3c.dom.ls.LSOutput;
+
+import javax.crypto.spec.PSource;
+
+public class Phone {
     public String owner;
 
     public Phone(String owner) {
@@ -14,4 +18,6 @@ public abstract class Phone {
     public void turnOff() {
         System.out.println("폰 전원을 끕니다.");
     }
+
+    public void boom() { System.out.println("폰이 폭발합니다."); }
 }

@@ -6,6 +6,11 @@ public class SmartPhone extends Phone {
         super(owner);
     }
 
+    @Override
+    public void turnOn() {
+        System.out.println("폰 전원을 빠르게 켭니다.");
+    }
+
     public void internetSearch() {
         System.out.println("인터넷 검색을 합니다.");
     }
