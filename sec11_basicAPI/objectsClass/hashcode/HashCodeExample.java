@@ -20,6 +20,7 @@ public class HashCodeExample {
 
         @Override
         public int hashCode() {
+        	//sno, name 둘다 같아야 논리적으로 같은 객체로 판단하도록 하기위한 객체해시코드.
             return Objects.hash(sno,name);
         }
 
