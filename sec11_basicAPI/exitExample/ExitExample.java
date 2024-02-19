@@ -14,7 +14,7 @@ public class ExitExample {
 		for(int i=0; i<10; i++) {
 			System.out.println(i);
 
-			try {
+			try { 
 				System.exit(i);
 			} catch(SecurityException e) { }
 		}
