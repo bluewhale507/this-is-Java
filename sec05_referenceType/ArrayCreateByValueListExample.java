@@ -1,4 +1,4 @@
-package sec05_ReferenceType;
+package sec05_referenceType;
 
 public class ArrayCreateByValueListExample {
     public static void main(String[] args) {
