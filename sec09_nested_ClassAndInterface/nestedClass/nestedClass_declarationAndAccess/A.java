@@ -1,6 +1,6 @@
 package sec09_nested_ClassAndInterface.nestedClass.nestedClass_declarationAndAccess;
 
-//외부 클래스
+/* 외부 클래스 */
 class A {
     A() {
         System.out.println("A 객체가 생성됨");
@@ -23,11 +23,7 @@ class A {
         C var2 = new C();
     }
 
-
-
-
-    //인스턴스 멤버 클래스
-    //A 객체를 생성해야 사용할 수 있는 B 중첩 클래스
+    /* 인스턴스 멤버 클래스 : 객체를 생성해야 사용할 수 있는 B 중첩 클래스 */
     class B {
         B() {
             System.out.println("B 객체가 생성됨");
@@ -46,8 +42,7 @@ class A {
         //static void method2() { }
     }
 
-    //정적 멤버 클래스
-    //A 클래스로 바로 접근할 수 있는 B 중첩 클래스
+    /* 정적 멤버 클래스 : A 클래스로 바로 접근할 수 있는 B 중첩 클래스 */
     static class C {
         C() {
             System.out.println("C 객체가 생성됨");
