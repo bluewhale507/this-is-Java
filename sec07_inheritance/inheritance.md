@@ -27,7 +27,38 @@
 
 ## protected 접근 제한자
 protected 접근 제한자는 default와 public의 중간에 위치한 접근 제한 수준을 갖는다. 자식클래스이기만 하면 패키지와 관계없이 모두 접근이 가능하지만, 생성자를 직접 호출하는 방식으로 생성할 수는 없고, 상속받은 자식 클래스의 생성자에서 super()를 통해 호출할 수 있다.
+```java
+// protected 클래스
+package package1;
 
+public class A {
+    protected String field;
+    
+    protected A() { }
+    
+    protected void method() { }
+}
+```
+```java
+// 실행 클래스
+package package2;
+
+public class C {
+    public void method() {
+        A a = new A();          // x
+        a.field = "value";      // x
+        a.method();             // x
+    }
+}
+
+public class D extends A {
+    public D() {
+        super();
+        this.field = "value";
+        this.method();
+    }
+}
+```
 ## 타입변환과 다형성
 자바는 부모클래스로 타입 변환을 허용한다. 즉 부모 타입에 모든 자식 객체가 대입될 수 있다.
 
