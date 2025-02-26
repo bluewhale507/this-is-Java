@@ -1,4 +1,4 @@
-package sec11_basicAPI.exitExample;
+package sec11_basicAPI.SystemExample;
 
 public class ExitExample {
 	public static void main(String[] args) {

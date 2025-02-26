@@ -44,7 +44,7 @@ public class ReflectionExample {
 	private static void printParameters(Class[] parameters) {
 		for(int i=0; i<parameters.length; i++) {
 			System.out.print(parameters[i].getName());
-			if(i<(parameters.length-1)) System.out.println(",");
+			if(i<(parameters.length-1)) System.out.print(",");
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package sec11_basicAPI.exitExample;
+package sec11_basicAPI.SystemExample;
 
 public class Employee {
 	public int eno;

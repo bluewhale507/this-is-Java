@@ -21,7 +21,6 @@ public class ClassExample {
 			System.out.println(clazz2.getPackage().getName());
 			System.out.println();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

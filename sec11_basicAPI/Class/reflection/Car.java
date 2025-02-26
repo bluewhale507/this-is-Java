@@ -3,6 +3,8 @@ package sec11_basicAPI.Class.reflection;
 public class Car {
 	private String model;
 	private String owner;
+	private String name;
+	private String sex;
 	
 	public Car() {
 		
@@ -24,7 +26,9 @@ public class Car {
 		return owner;
 	}
 
-	private void setOwner(String owner) {
+	private void setOwner(String owner, String name, String sex) {
 		this.owner = owner;
+		this.name = name;
+		this.sex = sex;
 	}
 }
