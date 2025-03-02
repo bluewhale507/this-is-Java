@@ -832,3 +832,292 @@ public class StringVlaueOfExmaple {
 ```
 
 ### StringTokenizer 클래스
+문자열이 특정 구분자로 연결되어 있을 경우, 구분자를 기준으로 부분 문자열을 분리하기 위해서는 String.split()을 이용하거나, java.util.StringTokenizer 클래스를 이용할 수 있다. spilt()은 정규표현식으로 구분하고, StringTokenizer는 문자로 구분한다.  
+
+#### split() 메소드
+> String.split() 메소드는 정규표현식을 구분자로 해서 문자열을 분리한 후, 배열에 저장하고 리턴한다.  
+> 
+> String[] result = "문자열".split("정규표현식");
+```java
+public class StringSplitExample {
+    public static void main(String[] args) {
+        String text = "홍길동&이수홍, 박연수, 김자바-최명호";
+        
+        String[] names = text.split("&|,|-");
+        
+        for(String name : names) {
+            System.out.println(name);
+        }
+    }
+}
+```
+
+#### StringTokenizer 클래스
+문자열이 한 종류의 구분자로 되어있을 경우, StringTokenizer 클래스를 사용하면 손쉽게 문자열 토큰을 분리해낼 수 있다. StringTokenizer 객체를 생성할 때 첫번째 매개값으로 전체문자열을 주고, 두번째 매개값으로 구분자를 주면 된다. 만약 구분자를 생략하면 공백이 구분자가 된다.  
+> String text = "홍길동/이수홍/박연수";  
+> StringTokenizer st = new StringTokenizer(text, "/");
+> 부분문자열을 분리해낸 StringTokenizer 객체를 아래 메서드를 이용해 토큰을 읽으면 된다.
+
+| 반환타입 |메소드|설명|
+|:-----|:---|:---|
+| int  |countTokens()|꺼내지 않고 남아있는 토큰의 수|
+|boolean|hasMoreToken()|남아 있는 토큰이 있는지 여부|
+|String|nextToken()|토큰을 하나씩 꺼내옴|
+
+```java
+import java.util.StringTokenizer;
+
+public class StringTokenizerExample {
+    public static void main(String[] args) {
+        String text = "홍길동/이수홍/박연수";
+
+        //how1 : 전체 토큰수를 얻어 for문으로 루핑
+        StringTokenizer st = new StringTokenizer(text, "/");
+        int countTokens = st.countTokens();
+        
+        for(int i=0; i<countTokens; i++) {
+            String token = st.nextToken();
+            System.out.println(token);
+        }
+        System.out.println();
+        
+        //how2 : 남아 있는 토큰을 확인하고 while 문으로 루프함
+        st = new StringTokenizer(text, "/");
+        while(st.hasMoreTokens()) {
+            String tokens = st.nextToken();
+            System.out.println(token);
+        }
+    }
+}
+```
+
+### StringBuffer, StringBuilder 클래스
+문자열을 결합하는 + 연산자를 많이사용할 수록 그만큼 String 객체의 수가 늘기 때문에 프로그램의 성능을 느리게 하는 요인이 된다. 문자열을 변경하는 작업이 많은 경우에는 java.lang 패키지의 StringBuffer 또는 StringBuilder 클래스를 사용하는 것이 좋다. 이 두 클래스는 내부 버퍼에 문자열을 저장해 두고, 그 안에서 추가, 수정, 삭제 작업을 할 수 있도록 설계되어 있다.  
+
+StringBuffer와 StringBuilder의 차이는 StringBuffer는 멀티 스레드 환경에서 사용할 수 있도록 동기화가 적용되어 있어 스레드에 안전하지만, StringBuilder는 단일스레드환경에서만 사용하도록 설계되어있다. StringBuilder는 버퍼가 부족할 경우 자동으로 크기를 늘려쥑 때문에 초기 버퍼의 크기는 그다지 중요하지 않다.  
+
+| 메소드                        |설명|
+|:---------------------------|:---|
+| append(...)                |문자열 끝에 주어진 매개값을 추가|
+| insert(int offset, ...)    |문자열 중간에 주어진 매개값을 추가|
+| delete(int start, int end) |문자열의 일부분을 삭제|
+|deleteCharAt(int index)|문자열에서 주어진 index의 문자를 삭제|
+|replace(int start, int end, Strint str)|문자열의 일부분을 다른 문자열로 대치|
+|reverse()|문자열의 순서를 뒤바꿈|
+|setCharAt(int index, char ch)|문자열에서 주어진 index의 문자를 다른 문자로 대치|
+
+append()와 insert()는 매개변수가 다양한 타입으로 오버로딩 되어있기 때문에, 대부분의 값을 문자로 추가 또는 삽입할 수 있다.  
+
+```java
+public class StringBuilderExample {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("Java ");
+        sb.append("Program Study");
+        System.out.println(sb.toString());
+        
+        sb.insert(4, "2");
+        System.out.println(sb.toString());
+        
+        sb.setCharAt(4,'6');
+        System.out.println(sb.toString());
+        
+        sb.replace(6,13,"Book");
+        System.out.println(sb.toString());
+        
+        sb.delete(4,5);
+        System.out.println(sb.toString());
+        
+        int length = sb.length();
+        System.out.println("총문자수:"+length);
+        
+        String result = sb.toString();
+        System.out.println(result);
+    }
+}
+```
+
+### 정규 표현식과 Patter 클래스
+문자열이 정해져 있는 형식으로 구성되어 있는지 검증해야 하는 경우 사용하는 클래스
+
+#### 정규표현식 작성 방법
+<img src="basicAPI_07.png" width="100%">  
+
+##### 전화번호를 위한 정규 표현식(02-xxx-xxxx or 010-xxxx-xxxx)
+> (02|010)-\d{3,4}-\d{4}  
+
+##### 이메일을 위한 정규 표현식(white@naver.com)
+> \w+@\w+\\. \w+(\\.\w+)?
+
+| 기호        | 설명                      |
+|:----------|:------------------------|
+| \w+       | 한 개 이상의 알파벳 또는 숫자       |
+| @         | @                       |
+| \w+       | 한 개 이상의 알파벳 또는 숫자       |
+| \\.       | .                       |
+| \w+       | 한 개 이상의 알파벳 또는 숫자       |
+| (\\.\w+)? | \\.\w+이 없거나 한번 더 올 수 있음 |
+
+주의할 점은 \\.과 .은 다른데, \\.은 문자로서의 점을 말하지만 .은 모든 문자 중에서 한개의 문자를 뜻한다.  
+
+#### Pattern 클래스
+정규 표현식으로 문자열을 검증하려면 java.util.regex.Pattern 클래스의 정적 메소드인 matches()를 이용하면 된다. 첫번째 매개값은 정규표현식이고, 두 번재 매개값은 검증할 문자열이다. 검증 후 결과가 boolean타입으로 리턴된다.
+
+```java
+import java.util.regex.Pattern;
+
+public class PatternExample {
+    public static void main(String[] args) {
+        String regExp = "(02|010)-\d{3,4}-\d{4}";
+        String data = "010-123-4567";
+
+        boolean result = Pattern.matches(regExp, data);
+        if(result) {
+            System.out.println("정규식과 일치합니다.");
+        } else {
+            System.out.println("정규식과 일치하지 않습니다.");
+        }
+        
+        regExp = "\w+@\w+\\. \w+(\\.\w+)?";
+        data = "anger@navercom";
+        result = Pattern.matches(regExp, data);
+        if(result) {
+            System.out.println("정규식과 일치합니다.");
+        } else {
+            System.out.println("정규식과 일치하지 않습니다.");
+        }
+    }
+}
+```
+
+### Arrays 클래스
+Arrays 클래스는 배열 조작 기능을 가지고 있다. 배열 조작이란 배열의 복사, 항목 정렬, 항목 검색과 같은 기능을 말한다. 단순한 배열 복사는 System.arraycopy() 메소드를 이용하면 되지만 Arrays는 추가적으로 항목정렬, 항목 검색, 항목 비교와 같은 기능을 제공해 준다.  
+
+|리턴 타입| 메소드 이름                            | 설명                                                                           |
+|:---|:----------------------------------|:-----------------------------------------------------------------------------|
+|int| binarySearch(배열, 찾는값)             | 전체 배열 항목에서 찾는 값이 있는 인덱스 리턴                                                   |
+|타겟 배열| copyOf(원본 배열, 복사할 길이)             | 원본 배열의 0번 인덱스에서 복사할 길이만큼 복사한 배열 리턴, 복사할 길이는 원본 배열의 길이보다 커도되며, 타겟 배열이 길이가 된다. |
+|타겟 배열| copyOfRange(원본 배열, 시작 인덱스, 끝 인덱스) | 원본 배열의 시작 인덱스에서 끝 인덱스 전까지 복사한 배열 리턴                                          |
+|boolean| deepEquals(배열, 배열)                | 두 배열의 깊은 비교(중첩 배열의 항목까지 비교)                                                  |
+|booelan| equals(배열, 배열)                    | 두 배열의 얕은 비교(중첩 배열의 항목은 비교하지 않음)                                              |
+|void| fill(배열, 값)                       | 전체 배열에 동일한 값을 저장                                                             |
+|void| fill(배열, 시작 인덱스, 끝 인덱스, 값)        | 시작 인덱스부터 끝 인덱스까지 항목에만 동일한 값을 저장                                              |
+|void| sort(배열)                          | 배열의 전체 항목을 오름차순으로 정렬                                                         |
+|String| toString(배열)                      | "[값1, 값2, ...]"와 같은 문자열 리턴                                                   |
+
+#### 배열 복사
+배열 복사를 위해 사용할 수 있는 메소드는 Arrays.copyOf(원본배열, 복사할 길이), Arrays.copyOfRange(원본배열, 시작인덱스, 끝 인덱스)이다. 복사할 배열의 길이는 원본배열의 길이보다 커도 되며, 타겟 배열의 길이가 된다.  
+> char[] arr1 = {'J', 'A', "V", "A"};  
+> char[] arr2 = Arrays.copyOf(arr1, arr1.length);
+
+copyOfRange(원본배열, 시작 인덱스, 끝 인덱스)는 원본 배열의 시작 인덱스에서 끝 인덱스까지 복사한 배열을 리턴한다. 이때 시작인덱스는 포함되지만, 끝 인덱스는포함되지 않는다.
+> char[] arr1 = {'J', 'A', "V", "A"};  
+> char[] arr2 = Arrays.copyOfRange(arr1, 1, 3);
+
+단순히 배열을 복사할 목적이라면 Arrays 클래스가 아닌 System.arraycopy() 메소드를 이용할 수 있다. 이 메소드는 다음과 같이 5개의 매개값이 필요하다.  
+> System.arraycopy(원본배열, 원본시작인덱스, 타겟배열, 타겟시작인덱스, 복사개수)  
+
+```java
+public class ArrayCopyExampl {
+    public static void main(String[] args) {
+        char[] arr1 = {'J', 'A', 'V', 'A'};
+        
+        // 방법 1
+        char[] arr2 = Arrays.copyOf(arr1, arr1.length);
+        System.out.println(Arrays.toString(arr2));
+        
+        // 방법 2
+        char[] arr3 = Arrays.copyOfRange(arr1, 1, 3);
+        System.out.println(arr3.toString());
+        
+        // 방법 3
+        char[] arr4 = new char[arr1.length];
+        System.arraycopy(arr1, 0, arr4, 0, arr1.length);
+        for(int i=0;i<arr4.length; i++) {
+            System.out.println("arr4["+i+"]="+arr4[i]);
+        }
+    }
+}
+```
+
+#### 배열 항목 비교
+Arrays.equals()와 Arrays.deepEquals()는 배열 항목을 비교한다. equals()는 1차 항목의 값만 비교하고, deepEquals()는 1차항목이 서로 다른 배열을 참조할 경우 중첩된 배열의 항목까지 비교한다.
+
+```java
+import java.util.Arrays;
+
+public class EqualsExample {
+    public static void main(String[] args) {
+        int[][] original = {{1, 2}, {3, 4}};
+
+        // 얕은 복사 후 비교
+        System.out.println("[얕은 복제후 비교]");
+        int[][] cloned1 = Arrays.copyOf(original, original.length);
+        System.out.println("배열 번지 비교: " + original.equals(cloned2));         // Object.equals()
+        System.out.println("1차 배열 항목값 비교: " + Arrays.equals(original, cloned1));
+        System.out.println("중첩 배열 항목값 비교: " + Arrays.deepEquals(original, cloned1));
+        
+        // 깊은 복사 후 비교
+        System.out.println("[깊은 복제후 비교]");
+        int[][] cloned2 = Arrays.copyOf(original, original.length);
+        cloned2[0] = Arrays.copyOf(original[0], original[0].length);
+        cloned2[1] = Arrays.copyOf(original[1], original[1].length);
+        System.out.println("배열 번지 비교: " + original.equals(cloned2));         // Object.equals()
+        System.out.println("1차 배열 항목값 비교: " + Arrays.equals(original, cloned2));
+        System.out.println("중첩 배열 항목값 비교: " + Arrays.deepEquals(original, cloned2));
+    }
+}
+```
+
+#### 배열 항목 정렬
+기본타입 또는 String 배열은 Arrays.sort() 메소드의 매개값으로 지정해주면 자동으로 오름차순 정렬이 된다. 사용자 정의 클래스 타입일 경우에는 클래스가 Comparable 인터페이스를 구현하고 있어야 정렬이 된다. 아래는 Member 배열을 정렬하기 위해 Comparable 인터페이스를 구현한 Member 클래스이다.
+```java
+public class Member implements Comparable<Member> {
+    String name;
+    Member(String name) {
+        this.name = name;
+    }
+    
+    @Override
+    public int compareTo(Member o) {
+        return name.compareTo(o.name);
+    }
+}
+```
+> Comparable<Member>는 Member 타입만 비교하기 위해 제네릭<>을 사용하였고, compareTo()메소드는 String 비교값(사전순)을 리턴하도록 재정의했다. compareTo() 메소드는 오름차순일 때, 호출한 String 시퀀스가 인자로 넘겨준 String 시퀀스보다 낮을경우(앞설경우) 음수, 같은경우 0, 높을 경우 양수를 리턴한다.
+```java
+public class SortExample {
+    public static void main(String[] args) {
+        int[] scores = {99, 97, 98};
+        Arrays.sort(scores);
+        for(int i=0;i<scores.length;i++){
+            System.out.println("score["+i+"]="+scores[i]);
+        }
+        System.out.println();
+
+        String[] names = {"홍길동", "박동수", "김민수"};
+        Arrays.sort(names);
+        for(int i=0;i<names.length;i++){
+            System.out.println("names["+i+"]="+names[i]);
+        }
+        System.out.println();
+
+        Member m1 = new Member("홍길동");
+        Member m2 = new Member("박동수");
+        Member m3 = new Member("김민수");
+        Mebmer[] members = {m1, m2, m3};
+        Arrays.sort(members);
+        for(int i=0;i<members.length;i++){
+            System.out.println("members["+i+"].name="+members[i].name);
+        }
+        System.out.println();
+    }
+}
+```
+> Comparator를 구현한 비교자 객체를 Object.compare()로 비교하는 것과 비슷한 형태이다. 차이점은 Comprator는 여러 정렬기준을 갖도록 할 수 있고, 클래스 자체를 수정하지 않고 Comparator 객체만 작성하면 된다. 그러나 Comparable 인터페이스는 비교의 대상이 되는 클래스 자체에 정렬기준을 포함시키고, 단일 정렬기준만을 가질때 사용하면 좋다.
+
+#### 배열 항목 검색
+배열항목에서 특정값이 위치한 인덱스를 얻는것을 배열 검색이라고 한다. 배열 항목을 검색하려면 먼저 Arrays.sort() 메소드로 항목들을 오름차순으로 정렬한 후, Arrays.binarySearch() 메소드로 항목을 찾아야 한다.
+
+참고 : [SearchExmaple.java](./ArraysExample/SearchExample.java)
