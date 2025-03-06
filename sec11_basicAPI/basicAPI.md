@@ -6,6 +6,7 @@
 >java.lang 패키지는 문자열 처리, 수학 연산, 스레드 처리 ,예외 처리, 기본 자료형 클래스와 같은 자바 프로그램의 기본적인 클래스를 담고 있는 패키지이다. 그러므로 import 없이 사용할 수 있다. 아래 나열된 클래스 외에도 Exception, Error, Enum, Throwable 같은 클래스도 속해있다.
 
 <img src="basicAPI_01.png" width="100%">
+
 ### java.util 패키지
 > 컬렉션 프레임워크, 날짜 및 시간 클래스, 랜덤 및 난수 생성과 관련한 중요한 유틸리티 클래스들을 제공하며 데이터 구조와 관련된 많은 기능을 제공한다.
 
@@ -41,6 +42,7 @@ public class Member {
 객체 해시코드란 객체를 식별할 하나의 정수값을 말한다. Object의 hashCode() 메소드는 객체의 메모리 번지를 이용해서 해시코드를 만들어 리턴하기 때문에 객체마다 다른 값을 가지고 있다. hash기반 컬렉션에서 논리적 동등 비교 시 hashCode()를 오버라이딩 할 필요성이 있는데, 컬렉션 프레임워크 중 HashSet, HashMap, Hashtable은 hashCode()를 실행해서 리턴된 결과값을 비교한 후, 같으면 equals()로 다시 비교한다. 둘다 같아야만(true) 동등객체로 판단한다.
 
 <img src="basicAPI_02.png" width="70%" style="display: block; margin: 0 auto;">
+
 ```java
 public class Key {
     public int number;
@@ -227,7 +229,19 @@ public class Car {
 
 #### 객체 소멸자
 참조하지 않는 배열이나 객체는 쓰레기 수집기가 힙 영역에서 자동으로 소멸시킨다. 쓰레기 수집기는 객체를 소멸하기 전에 마지막으로 객체의 소멸자(finalize())를 실행시킨다. 소멸자는 기본적으로 실행내용이 없지만, 만약 객체가 소멸되기 전에 마지막으로 사용했던 자원을 닫고 싶거나 중요한 데이터를 저장하고 싶다면 재정의 할 수 있다.
-
+```java
+public class Counter {
+    private int no;
+    
+    public Counter (int no) {
+        this.no = no;
+    }
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println(no+"번 객체의 finalize()가 실행됨");
+    }
+}
+```
 ```java
 public class FinalizeExample {
     public static void main(String[] args) {
@@ -253,7 +267,8 @@ public class FinalizeExample {
 효율적인 대안 존재: Java 9 이후부터는 Cleaner 클래스가 더 나은 자원 해제 방법으로 제안되고 있습니다.
 
 ### Objects 클래스
-Object와 유사한 이름을 가진 java.util.Objects 클래스는 객제비교, 해시코드생성, null 여부, 객체 문자열 리턴 등의 연산을 수행하는 static 메소드들로 구성된 Object의 유틸리티 클래스이다. s가 붙은 유틸리티 클래스는 일반적으로 객체 생성없이 사용할 수 있도록 만들어 놓은 클래스이다.
+Object와 유사한 이름을 가진 java.util.Objects 클래스는 객제비교, 해시코드생성, null 여부, 객체 문자열 리턴 등의 연산을 수행하는 static 메소드들로 구성된 Object의 유틸리티 클래스이다. s가 붙은 유틸리티 클래스는 일반적으로 객체 생성없이 사용할 수 있도록 만들어 놓은 클래스이다.  
+
 <img src="basicAPI_05.png" width="100%" style="display: block; margin: 0 auto;">
 
 #### 객체비교(compare(T a, T b, Comparator<T> c))
@@ -942,6 +957,7 @@ public class StringBuilderExample {
 문자열이 정해져 있는 형식으로 구성되어 있는지 검증해야 하는 경우 사용하는 클래스
 
 #### 정규표현식 작성 방법
+
 <img src="basicAPI_07.png" width="100%">  
 
 ##### 전화번호를 위한 정규 표현식(02-xxx-xxxx or 010-xxxx-xxxx)
@@ -1121,3 +1137,233 @@ public class SortExample {
 배열항목에서 특정값이 위치한 인덱스를 얻는것을 배열 검색이라고 한다. 배열 항목을 검색하려면 먼저 Arrays.sort() 메소드로 항목들을 오름차순으로 정렬한 후, Arrays.binarySearch() 메소드로 항목을 찾아야 한다.
 
 참고 : [SearchExmaple.java](./ArraysExample/SearchExample.java)
+
+## Wrapper(포장) 클래스
+자바는 기본 타입의 값을 갖는 객체를 생성할 수 있다. 이런 객체를 포장객체라고 하는데, 그 이유는 기본 타입의 값을 내부 필드로 둔 객체를 생성하여 기본타입을 참조타입과 같이 이용하기 때문이다. 포장 객체의 특징은 포장하고 있는 기본 타입 값은 외부에서 변경할 수 없다. 만약 내부의 값을 변경하고 싶다면 새로운 포장 객체를 만들어야한다.  
+
+포장 클래스는 java.lang 패키지에 포함되어 있는데, 아래와 같이 기본 타입에 대응되는 클래스들이 있다.
+
+|기본타입|포장 클래스|
+|:---|:---|
+|byte|Byte|
+|char|Character|
+|short|Short|
+|int|Interger|
+|long|Long|
+|float|Float|
+|double|Double|
+|boolean|Boolean|
+
+### 박싱과 언박싱
+기본타입의 값을 포장 객체로 만드는 과정을 박싱이라고 하고, 반대로 포장 객체에서 기본 타입의 값을 얻어내는 과정을 언박싱 이라고 한다. 간단하게 포장 클래스의 생성자 인수로 기본타입의 값 또는 문자열을 넘겨주면 된다.
+
+| 기본타입의 값을 줄 경우                       |문자열을 줄 경우|
+|:------------------------------------|:---|
+| Byte obj = new Byte(10);            |Byte obj = new Byte("10");|
+| Character obj = new Character('가'); | 없음 |
+| Short obj = new Short(100);         |Short obj = new Short("100");|
+| Integer obj = new Integer(1000);    |Integer obj = new Integer("1000");|
+| Long obj = new Long(10000);         |Long obj = new Long("10000");|
+|Float obj = new Double(3.5);|Double obj = new Double("3.5");|
+|Boolean obj = new Boolean(true);|Boolean obj = new Boolean("true");|
+
+생성자를 이용하지 않아도 다음과 같이 각 포장 클래스마다 가지고 있는 정적 valueOf() 메소드를 사용해도 된다.
+> Integer obj = Integer.valueOf(1000);  
+> Integer obj = Integer.valueOf("1000");
+
+이렇게 박싱된 포장 객체에서 다시 기본타입의 값을 얻어 내기 위해서는(언박싱하기 위해서는) 각 포장 클래스마다 가지고 있는 기본타입명+value() 메소드를 호출하면된다.
+
+| 기본타입의 값을 이용                       |
+|:----------------------------------|
+| byte num = obj.byteValue();       |
+| char num = obj.charValue();       |
+| short num = obj.shortValue();     |
+| int num = obj.intValue();         |
+| long num = obj.longValue();       |
+| float num = obj.floatValue();     |
+| double num = obj.doubleValue();   |
+| booelan num = obj.booleanValue(); |
+
+```java
+public class BoxingUnBoxingExample {
+    public static void main(String[] args) {
+        // Boxing
+        Integer obj1 = new Integer(100);
+        Integer obj2 = new Integer("200");
+        Integer obj3 = new Integer.valueOf("300");
+        
+        // obj1과 obj2의 Wrapper 객체 생성 방식은 java9 이후로 Deprecated 되어 16에서 사라졌다.
+        
+        // UnBoxing
+        int value1 = obj1.intValue();
+        int value2 = obj2.intValue();
+        int vlaue3 = obj3.intValue();
+
+        System.out.println(value1);
+        System.out.println(value2);
+        System.out.println(value3);
+    }
+}
+```
+
+### 자동 박싱과 언박싱
+기본타입 값을 직접 박싱, 언박싱 하지 않아도 자동으로 일어나는 경우가 있다. 자동 박싱은 포장클래스 타입의 변수에 primitive 값이 대입될 경우에 자동 boxing이 일어나 힙영역에 Integer 객체가 생성된다.  
+> Integer obj = 100; //자동 언박싱
+
+자동 언박싱은 기본타입의 변수에 Wrapper 객체가 대입될 경우에 발생한다. 
+> Integer obj = new Instance(200);  
+> int value = obj;  
+> int value2 = obj + 100;
+
+컬렉션 객체에 int값을 저장하면 자동 박싱이 일어나 Integer 객체가 저장된다.
+> List<Integer> list = new ArrayList<Integer>();
+> list.add(200); // 자동 언박싱
+
+```java
+import java.sql.SQLOutput;
+
+public class AutoBoxingUnBoxingExample {
+    public static void main(String[] args) {
+        // 자동 Boxing
+        Integer obj = 100;
+        System.out.println("value: " + obj.intValue());
+        
+        // 대입 시 자동 Unboxing
+        int value = obj;
+        System.out.println("value: " + value);
+        
+        // 연산 시 자동 Unboxing
+        int result = obj + 100;
+        System.out.println("result: " + result);
+    }
+}
+```
+
+### 문자열을 기본타입의 값으로 변환
+포장 클래스의 주요 용도는 기본 타입의 값을 박싱해서 포장 객체로 만드는 것이지만, 문자열을 기본 타입 값으로 변환할 때에도 많이 사용된다. 대부분의 Wrapper 클래스에는 parse+기본타입 명으로 된 정적 메소드가 있다. 이 메소드는 문자열을 인자로 넘겨받아 기본타입 값으로 변환한다.
+
+|기본 타입의 값을 이용|
+|:---|
+|byte num = Byte.parseByte("10");|
+|short num = Short.parseShort("100");|
+|int num = Integer.parseInt("1000");|
+|float num = Float.parseFloat("2.5F");|
+|double num = Double.parseDouble("3.5");|
+|boolean bool = Boolean.parseBoolean("true");|
+
+### 포장 값 비교
+포장 객체는 내부의 값을 비교하기 위해 ==와 != 연산자를 사용할 수 없다. 내부의 값만 비교하려면 언박싱한 값을 얻어 비교해야 한다. 예외로 박싱된 값이 만약 boolean과 char, byte, short, int 라면 ==와 != 연산자로 값을 바로 비교할 수 있다.
+
+|타입|값의 범위|
+|:---|:---|
+|boolean|true, false|
+|char|\u0000 ~ \u0071|
+|byte, short, int|-128~127|
+
+포장객체에 정확히 어떤 값이 저장될 지 모르는 상황이라면 비교연산자를 이용하는것보단 내부 값을 언박싱해서 비교하거나, equals() 메소드로 내부 값을 비교하는 것이 좋다. 포장 클래스의 equals()메소드는 내부의 값을 비교하도록 오버라이딩 되어있다.  
+
+## Math, Random 클래스
+### Math 클래스
+java.lang.Math 클래스는 수학 계산에 사용할 수 있는 메소드를 제공하고 있다. Math 클래스가 제공하는 메소드는 모두 static이므로 바로 사용이 가능하다.
+
+| 메소드                    | 설명          | 예제 코드                         | 리턴값              |
+|:-----------------------|:------------|:------------------------------|:-----------------|
+| int abs(int a)         | 절대값         | int v1 = Math.abs(-5);        | v1 = 5           |
+| double ceil(double a)  | 올림값         | double v3 = Math.ceil(-5.3);  | v3 = -5.0        |
+| double floor(double a) | 버림값         | double v5 = Math.floor(-5.3); | v3 = -6.0        |
+| int max(int a, int b)  | 최대값         | int v7 = Math.max(5,9);       | v7 = 9           |
+| int min(int a, int b)  | 최소값         | int v9 = Math.min(5,9);       | v9 = 5           |
+| double random()        | 랜덤값         | double v11 = Math.random()    | 0.0 <= v11 < 1.0 |
+| double rint(double a)  | 가까운 정수의 실수값 | double v12 = Math.rint(5.3)   | v12 = 5.0        |
+| long round(double a)   | 반올림값        | long v14 = Math.round(5.3)    | v14 = 5          |
+
+```java
+double value = 12.3456;  
+double temp1 = value * 100;  
+long temp2 = Math.round(temp1);  
+double v16 = temp / 100.0;  
+System.out.println("v1"+v16); // 12.35    
+```
+round() 메소드는 항상 소수점 첫째 자리에서 반올림해서 정수값을 리턴한다. 원하는 소수 자릿수에서 반올림된 값을 얻기 위해서는 반올림할 자릿수가 소수점 첫째 자리가 되도록 10^n을 곱한 후 round() 의 리턴값을 얻은 후 그 값을 다시 10^n으로 나누어주면 된다.  
+
+```java
+public class MathRandomExample {
+    public static void main(String[] args) {
+        int num = (int)(Math.random() * 6) + 1;
+        System.out.println("주사위의 눈: "+num);
+    }
+}
+```
+위는 한번 던져서 나오는 랜덤한 주사위의 눈을 구하기 위해 작성한 코드이다. Math.random() 메소드는 0.0이상 1.0미만의 범위에 속하는 하나의 double 타입의 값을 리턴한다. start <= ... < (start+n)의 범위에 속하는 하나의 정수를 얻기 위해서는 연산식을 이렇게 작성한다.  
+> int num = (int)(Math.random() * n) + start;
+
+### Random 클래스
+java.util.Random 클래스는 난수를 얻어내기 위해 다양한 메소드를 제공한다. Math.random() 메소드는 0.0에서 1 사이의 doulbe 난수를 얻는데만 사용한다면, Random 클래스는 boolean, int, long, float, double 난수를 얻을 수 있다. 또 다른 차이점은 Random 클래스는 종자값(seed)을 설정할 수 있다. 종자값은 난수를 만드는 알고리즘에 사용되는 값으로 종자값이 같으면 같은 난수를 얻는다. Random클래스로부터 Random객체를 생성하는 방법은 다음 두 가지가 있다.
+
+| 생성자               | 설명                               |
+|:------------------|:---------------------------------|
+| Random()          | 호출 시마다 다른 종자값(현재시간 이용)이 자동 설정된다. |
+| Random(long seed) | 매개값으로 주어진 종자값이 설정된다.             |
+
+다음은 Random 클래스가 제공하는 메소드이다.
+
+| 리턴값     | 메소드(매개변수)      | 설명                                   |
+|:--------|:---------------|:-------------------------------------|
+| boolean | nextBoolean    | boolean 타입의 난수를 리턴                   |
+| double  | nextDouble()   | double 타입의 난수를 리턴(0.0 <= ~ < 1.0)    |
+| int     | nextInt()      | int 타입의 난수를 리턴 (-2^31 <= ~ < 2^31-1) |
+| int     | nextInt(int n) | int 타입의 난수를 리턴 (0<= ~ < n)           |
+
+```java
+public class RandomExample {
+    public static void main(String[] args) {
+        // 선택번호
+        int[] selectNumber = new int[6];
+        Random random = new Random(3);
+        System.out.println("선택 번호: ");
+        
+        for(int i=0; i<6; i++) {
+            selectNumber[i] = random.nextInt(45) + 1;
+            System.out.println(selectNumber[i] + " ");
+        }
+        System.out.println();
+        
+        // 당첨번호
+        int[] winningNumber = new int[6];
+        random = new Random(5);
+        System.out.println("당첨 번호: ");
+
+        for(int i=0; i<6; i++) {
+            winningNumber[i] = random.nextInt(45) + 1;
+            System.out.println(winningNumber[i] + " ");
+        }
+        System.out.println();
+        
+        // 당첨여부
+        Arrays.sort(selectNumber);      // 비교하기 전 정렬
+        Arrays.sort(winningNumber);
+        boolean result = Arrays.equals(selectNumber, winningNumber);
+        System.out.println("당첨 여부: ");
+        if(result) {
+            System.out.println("1등에 당첨되셨습니다.");
+        } else {
+            System.out.println("당첨되지 않았습니다.");
+        }
+        
+        // 서로 다른 종자값을 주었기 때문에 선택번호와 당첨번호는 다를 수 밖에 없다.
+    }
+}
+```
+
+## Date, Calendar 클래스
+자바는 시스템의 날짜 및 시각을 읽을 수 있도록 Date와 Calendar 클래스를 제공하고 있다. 이 두 클래스는 모두 java.util 패키지에 포함되어 있다.
+### Date 클래스
+Date 클래스는 객체 간에 날짜 정보를 주고 받을 때 주로 사용된다. Date 클래스에는 여러개의 생성자가 선언되어 있지만 대부분 Deprecated(비권장) 되어 현재는 기본생성자만 주로 사용한다. Date() 생성자는 컴퓨터의 현재 날짜를 읽어 Date 객체로 만든다.
+> Date now = new Date();  
+
+현재 날짜를 문자열로 얻고 싶다면 toString() 메소드를 사용하면 된다. toString() 메소드는 영문으로 된 날짜를 리턴하는데 만약 특정 문자열 포맷으로 얻고 싶다면 java.text.SimpleDateFormat 클래스를 이용하면 된다.  
+
+### Calendar 클래스
+Calendar 클래스는 달력을 표현한 클래스이다. 이 클래스는 추상 클래스이므로 new 연산자를 사용해서 인스턴스를 생성할 수 없다. 날짜와 시간을 계산하는 방법이 지역과 문화, 나라에 따라 다르기 때문이다. 그래서 Calendar 클래스는 날짜와 시간을 계산하는데 꼭 필요한 메소드들만 선언되어있고, 특정한 역법을 따르는 계산로직은 하위클래스에서 구현하도록 되어있다. 특별한 역법을 사용하는 경우가 아니라면 직접 하위 클래스를 만들 필요는 없고 Calendar 클래스의 정적 메소드인 getInstance() 메소드를 이용하면 현재 운영체제에 설정되어 있는 시간대를 기준으로 한 Calendar 하위 객체를 얻을 수 있다.  
+> Calendar now = Calendar.getInstance();
+
