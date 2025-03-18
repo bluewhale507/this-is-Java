@@ -12,7 +12,7 @@
 ##### 쓰레기 값 
 > 저장할 수 있는 범위를 초과해서 값이 저장될 경우 엉터리 값이 변수에 저장되는데 이러한 값을 쓰레기 값이라고 한다.  
 
-참고 : [GarbageValueExampl.java](./GarbageValueExample.java)
+참고 : [GarbageValueExample.java](./GarbageValueExample.java)
 
 #### 2. char 타입
 > 자바는 모든 문자를 유니코드(Unicode)로 처리한다. 유니코드는 세계 각국의 문자들을 코드값으로 매핑한 국제 표준 규약이다.
@@ -60,7 +60,7 @@
 
 - e또는 E가 포함된 정수리터럴은 정수타입 변수에 저장할 수 없고 실수타입 변수에 저장해야한다.  
 
-참고 : [FloatDoubleExmaple.java](./FloatDoubleExmaple.java)
+참고 : [FloatDoubleExample.java](./FloatDoubleExmaple.java)
 
 ### 논리타입
 #### boolean 타입
@@ -98,7 +98,7 @@
 > 23bit를 초과하는 int 타입 변수가 Casting 되었을 경우 정확한 값을 표현할 수 없어 근사치로 표현된다.
 > 그래서 이러한 값을 int -> float -> int로 변환시 원래의 값을 얻지 못하는 정밀도 손실이 발생한다.
 
-참고 : [FromIntToFloat.java]() 
+참고 : [FromIntToFloat.java](./FromIntToFloat.java) 
 
 ## 연산식에서의 자동타입변환
 > <u>연산은 기본적으로 같은 타입의 피연산자 간에만 수행</u>되기 때문에 서로다른 타입의 피연산자가 있을경우 두 피연산자 중 크기가 큰 타입으로
@@ -123,4 +123,4 @@
 - char타입의 연산결과는 int타입으로 산출되므로 int타입 변수에 결과를 저장해야한다. 연산의 결과를 문자로 출력하기 위해서는 다시 char타입으로
 Casting 해 주어야 한다.
 
-참고 : [OperationsPromotionExample.java]()
+참고 : [OperationsPromotionExample.java](./OperationExample.java)
