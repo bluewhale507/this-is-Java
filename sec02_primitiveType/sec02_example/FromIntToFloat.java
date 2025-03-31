@@ -1,4 +1,4 @@
-package sec02_primitiveType;
+package sec02_primitiveType.sec02_example;
 
 public class FromIntToFloat {
     public static void main(String[] args) {

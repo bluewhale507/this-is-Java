@@ -67,11 +67,11 @@ String strValue = "A";
 답 : 4. 문자열은 참조타입이므로, Casting으로 char타입으로 타입변환이 불가능하다.
 
 ### 7. 변수를 잘못 초기화 한것은 무엇입니까?
-① int var1 = 10;
-② long var2 = 10000000000L;
-③ char var3 = '';
-④ double var4 = 10;
-⑤ float var5 = 10;
+① int var1 = 10;  
+② long var2 = 10000000000L;  
+③ char var3 = '';  
+④ double var4 = 10;  
+⑤ float var5 = 10;  
 
 답 : 3. char 변수는 ''와 같은 빈 문자로 초기화할 수 없다.
 
