@@ -1,5 +1,5 @@
 # This-is-Java
-이것이 자바다 책 학습 내용을 두고두고 간편하게 볼 겸 마크다운 익숙해질 겸 정리해둔 레포지토리.
+> 이것이 자바다 책 학습 내용을 두고두고 간편하게 볼 겸 마크다운 익숙해질 겸 정리해둔 레포지토리.
 
 sec 01 :   
 sec 02 : [variable & type](https://github.com/bluewhale507/this-is-Java/blob/main/sec02_primitiveType/primitiveType.md)  
@@ -11,6 +11,6 @@ sec 07 : [inheritance](https://github.com/bluewhale507/this-is-Java/blob/main/se
 sec 08 : [interface](https://github.com/bluewhale507/this-is-Java/blob/main/sec08_interface/interface.md)  
 sec 09 : [nestedClass](https://github.com/bluewhale507/this-is-Java/blob/main/sec09_nested_ClassAndInterface/nestedClass.md)  
 sec 10 : [exception](https://github.com/bluewhale507/this-is-Java/blob/main/sec10_exception/exception.md)  
-sec 11 : [JavaAPI](https://github.com/bluewhale507/this-is-Java/blob/main/sec11_basicAPI/basicAPI.md)  
-sec 12 :
-sec 13 : [generic](https://github.com/bluewhale507/this-is-Java/blob/main/sec12_generic/generic.md)  
+sec 11 : [JavaAPI](https://github.com/bluewhale507/this-is-Java/blob/main/sec11_basicAPI/basicAPI.md)   
+sec 12 :  
+sec 13 : [generic](https://github.com/bluewhale507/this-is-Java/blob/main/sec13_generic/generic.md)  
