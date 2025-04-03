@@ -47,3 +47,5 @@ Java 가상 머신이라고 해서 Java 바이트 코드만 인식하는 것은 
 
 - JRE = JVM + 표준 클래스 라이브러리
 - JDK = JRE + 개발도구
+
+## [연습문제 풀이](./ChapterTest.md)
