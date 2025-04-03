@@ -1,4 +1,4 @@
-package sec02_primitiveType.sec02_example;
+package sec02_primitiveType.example;
 
 public class CastingExample {
     public static void main(String[] args) {
