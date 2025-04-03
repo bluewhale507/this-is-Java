@@ -1,4 +1,4 @@
-package sec05_referenceType;
+package sec05_referenceType.example;
 
 public class StringEqualsExample {
     public static void main (String[] args) {
