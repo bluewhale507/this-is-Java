@@ -4,7 +4,7 @@
 
 > 자바에서는 에러 이외에 예외라고 부르는 오류가 있다. 예외란 사용자의 잘못된 조작 또는 개발자의 잘못된 코딩으로 인해 발생하는 프로그램 오류를 뜻한다. 예외가 발생되면 프로그램은 곧바로 종료되는점은 동일하지만, 예외처리를 통해 정상 실행상태를 유지하도록 할 수 있다.
 
-![exception_01.png](exception_01.png)
+<img src="img/exception_01.png" width="99%" style="display: block; margin: 0 auto;">
 
 예외는 일반 예외와 실행 예외 두 가지 종류가 있다. 일반 예외는 컴파일러 체크 예외라고도 하는데, 컴파일 하는 과정에서 예외처리가 필요한 코드인지, 그에 대한 예외처리가 되어있는지를 확인한다. 그러나 실행 예외는 컴파일 타임에는 확인되지 않고, 런타임에 발생하는 예외를 말한다.
 ```java
@@ -149,7 +149,8 @@ import java.io.IOException;
         }
 ```
 try블록이 정상적으로 실행을 완료했거나 도중에 예외가 발생하게 되면 자동으로 FileInputStream의 close() 메소드가 호출된다. try에서 예외가 발생하면 우선 close()로 닫고 catch 블록을 실행한다. try-with-resource 를 사용하기 위해 리소스 객체는 java.lang.AutoCloseable 인터페이스를 구현하고 있어야 한다.
-![exception_02](exception_02.png)  
+<img src="img/exception_02.png" width="99%" style="display: block; margin: 0 auto;">
+
 API document에서 AutoCloseable 인터페이스를 찾아 All Known Implementing Classes를 보면 try-with-resource와 함께 사용할 수 있는 리소스가 어떤 것이 있는지 알 수 있다.
 
 ```java
