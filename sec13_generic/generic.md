@@ -82,8 +82,8 @@ public class Box<String> {
 > public <T> Box boxing(T t) { ... }
 
 제네릭 메소드는 타입 파라미터의 구체적인 타입을 명시적으로 지정해도 되고, 컴파일러가 매개값의 타입을 보고 구체적인 타입을 추정하도록 할 수도 있다.  
-> Box<Integer> box = <Integer>boxing(100);      // 타입 파라미터를 명시적으로 Integer으로 지정  
-> Box<Integer> box = boxing(100);               // 타입 파라미터를 Integer로 추정
+> Box\<Integer> box = \<Integer>boxing(100);      // 타입 파라미터를 명시적으로 Integer으로 지정  
+> Box\<Integer> box = boxing(100);               // 타입 파라미터를 Integer로 추정
 
 참고 : [Util.java](./genericMethod/Util.java), [BoxingMethodExample.java](./genericMethod/BoxingMethodExample.java), 
 
@@ -91,8 +91,14 @@ public class Box<String> {
 
 참고 : [Util.java](./genericMethod/Util.java), [CompareMethodExample.java](./genericMethod/CompareMethodExample.java)
 
+### 유의사항
+> 타입 파라미터는 반환타입과는 별개로, 메서드 선언 앞에 <>로 반드시 선언해 주어야 한다. 자바 컴파일러는 메서드를 볼 때 이 메서드에서 어떤 제네릭 타입(T, K, V 등)을 쓸 건지 그리고 드 타입파라미터가 어디서부터 나왔는지(메서드 자체의 것인지, 클래스로부터 왔는지)를 구분해야 한다. 그래서 반환타입 앞에 타입 파라미터 선언이 꼭 필요하다.
+> ```java
+> public static <T> Box<T> boxing(T t) {...}
+> ```
+
 ## 제한된 타입 파라미터
-간혹 타입 파라미터에 지정되는 구체적인 타입을 제한할 필요가 있는 경우 `-예를들자면 숫자를 연산하는 제네릭 메소드는 매갯값으로 Number 타입 또는 그 하위 클래스 타입(Bye, Short, Integer, Long, Double)의 인스턴스만 가져야 한다.-` 타입 파라미터 뒤에 extends 뒤에 키워드를 붙이고 상위 타입을 명시하면 된다. 상위 타입은 클래스뿐만 아니라 인터페이스도 가능하다. 인터페이스 또한 extends 키워드를 사용한다.  
+간혹 타입 파라미터에 지정되는 구체적인 타입을 제한할 필요가 있는 경우 `-예를들자면 숫자를 연산하는 제네릭 메소드는 매갯값으로 Number 타입 또는 그 하위 클래스 타입(Byte, Short, Integer, Long, Double)의 인스턴스만 가져야 한다.-` 타입 파라미터 뒤에 extends 뒤에 키워드를 붙이고 상위 타입을 명시하면 된다. 상위 타입은 클래스뿐만 아니라 인터페이스도 가능하다. 인터페이스 또한 extends 키워드를 사용한다.  
 
 ```java
 public <T extends Number> int compar(T t1, T t2) {
@@ -112,11 +118,12 @@ public <T extends Number> int compar(T t1, T t2) {
 
 
 - **제네릭타입<? extends 상위타입> : Upper Bounded Wildcards (상위 클래스 제한)**  
-타입 파라미터를 대치하는 구체적인 타입으로 상위 타입이나 하위 타입만 올 수 있다.
+타입 파라미터를 대치하는 구체적인 타입으로 `상위 타입`위치에 기술된 클래스나 그 클래스의 하위 타입만 올 수 있다.
+*`<? extends Number> 인경우 Number 자기자신 혹은 그 자손 타입만 사용가능`*
 
 
 - **제네릭타입<? super 하위타입> : Lower Bounded Wildcards (하위 클래스 제한)**  
-타입 파라미터를 대치하는 구체적인 타입으로 하위타입이나 상위 타입이 올 수 있다.   
+타입 파라미터를 대치하는 구체적인 타입으로 `하위 타입`위치에 기술된 클래스나 그 클래스의 상위 타입만 올 수 있다.   
 *`<? super Number> 인경우 Number 자기자신 혹은 그 조상 타입만 사용가능`*
 
 참고 : [WildCardExample.java](./wildcardsType/WildCardExample.java), [Course.java](./wildcardsType/Course.java)
@@ -149,3 +156,5 @@ public class ChildProduct<T, M, C> extends Product<T, M> {
 ```
 
 제네릭 인터페이스를 구현한 클래스도 제네릭 타입이 된다.
+
+## [연습문제 풀이](./ChapterTest.md)
