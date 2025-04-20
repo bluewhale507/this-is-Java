@@ -1,6 +1,6 @@
-package sec08_interface.interface_implementaion.anonymous_implementaion_object;
+package sec08_interface.example.interface_implementaion.anonymous_implementaion_object;
 
-import sec08_interface.interface_declaration.RemoteControl;
+import sec08_interface.example.interface_declaration.RemoteControl;
 
 public class RemoteControlExample {
     /*

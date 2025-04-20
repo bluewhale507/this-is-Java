@@ -1,6 +1,6 @@
-package sec08_interface.interface_implementaion.multi_implementation;
+package sec08_interface.example.interface_implementaion.multi_implementation;
 
-import sec08_interface.interface_implementaion.Television;
+import sec08_interface.example.interface_declaration.RemoteControl;
 
 public class RemoteControlExample {
     public static void main(String[] args) {

@@ -1,6 +1,6 @@
-package sec08_interface.interface_elements_use;
+package sec08_interface.example.interface_elements_use;
 
-import sec08_interface.interface_declaration.RemoteControl;
+import sec08_interface.example.interface_declaration.RemoteControl;
 
 public class RemoteControlExample {
     public static void main(String[] args) {
