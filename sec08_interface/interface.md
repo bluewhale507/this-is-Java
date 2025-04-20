@@ -1,6 +1,6 @@
 # 인터페이스
 ## 인터페이스의 역할
-<img src="img/interface_01.png" width="100%" style="display: block; margin: 0 auto;">
+<img src="img/interface_01.png" width="100%" style="display: block; margin: 0 auto;">    
 
 > 자바에서 인터페이스는 객체의 사용방법을 정의한 타입이다. 자바 8의 람다식은 함수적 인터페이스의 구현 객체를 생성하기 때문에 이전보다 중요성이 더 커졌다. 인터페이스는 개발 코드와 객체가 서로 통신하는 접점 역할을 한다. 개발 코드가 인터페이스의 메소드를 호출하면 인터페이스는 객체의 메소드를 호출시킨다. 그렇기 때문에 개발 코드는 객체의 내부구조를 알 필요가 없고 인터페이스의 메서드만 알고 있으면 된다. 개발 코드를 수정하기 않고 사용하는 객체를 변경하기 위해 인터페이스를 중간에 둔다.
 
@@ -48,7 +48,7 @@ public interface RemoteControl {
 ```
 
 ### 추상 메소드 선언  
-<img src="img/interface_02.png" width="100%" style="display: block; margin: 0 auto;">
+<img src="img/interface_02.png" width="100%" style="display: block; margin: 0 auto;">  
 인터페이스를 통해 호출된 메소드는 최종적을 객체에서 실행된다. 그렇기 때문에 인터페이스의 메소드는 실행 블록이 필요없는 추상메소드로 선언한다. 인터페이스에 선언된 추상 메소드는 모두 public abstract의 특성을 갖기 때문에 생략하더라도 컴파일러가 붙여준다.
 ```java
 public interface RemoteControl {
@@ -133,7 +133,7 @@ public class RemoteControlExample {
 
 ### 다중 인터페이스 구현 클래스
 객체는 다음 그림과 같이 다수의 인터페이스 타입으로 사용할 수 있다.  
-<img src="img/interface_03.png" width="70%" style="display: block; margin: 0 auto;">
+<img src="img/interface_03.png" width="100%" style="display: block; margin: 0 auto;">  
 인터페이스 A와 B가 이 객체의 메소드를 호출할 수 있으려면 객체는 이 두 인터페이스를 모두 구현해야 한다. 따라서 구현 클래스는 다음과 같이 작성되어야 한다.
 > public class 구현클래스명 implements 인터페이스A, 인터페이스B {  
 > // 인터페이스 A에 선언된 추상 메소드의 실체 메소드 선언  
@@ -169,7 +169,7 @@ public class RemoteControlExample {
     }
 }
 ```
-
+f
 참고 : [Audio.java](./example/interface_elements_use/Audio.java)(인터페이스 구현 클래스), [Television.java](./example/interface_elements_use/Audio.java)(인터페이스 구현 클래스), [RemoteControlExample.java](./example/interface_elements_use/RemoteControlExample.java)(인터페이스 사용 클래스)
 
 ## 타입 변환과 다형성
@@ -177,7 +177,7 @@ public class RemoteControlExample {
 
 만약 인터페이스를 사용하였다면 인터페이스를 구현한 B클래스를 만들고 단 한줄만 수정한다면 소스코드는 변함이 없지만 구현객체의 교체로 인해 프로그램의 실행 결과가 달라진다.  
 ### 자동 타입 변환
-<img src="img/interface_04.png" width="80%" style="display: block; margin: 0 auto;">
+<img src="img/interface_04.png" width="100%" style="display: block; margin: 0 auto;">  
 
 > 구현 객체가 인터페이스 타입으로 변환되는것은 자동 타입 변환에 해당한다. 인터페이스 구현 클래스를 상속해서 자식 클래스를 만들었다면 자식 객체 역시 인터페이스 타입으로 자동 변환시킬 수 있다.  
 
