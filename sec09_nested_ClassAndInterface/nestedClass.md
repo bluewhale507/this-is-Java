@@ -114,7 +114,7 @@ void method() {
 > public void method() {
 >    int num = 10;  // final이 없음
 >    class LocalClass {
->       int copiedNum = num;  // 필드로 복사
+>       int copiedNum = num;  // 필드로 복사(변수의 scope가 method이므로, 메소드 종료시 변수 참조 불가오류를 방지하기 위해 필드에 복사해두고 사용
 >       void print() {
 >            System.out.println(copiedNum); 
 >        }
@@ -123,10 +123,10 @@ void method() {
 >```
 > [특이사항]   
 > ✔ Java 7 이전: `final`이 없으면 로컬 클래스의 필드로 복사, `final`이 있으면 메서드 내부 지역 변수로 유지됨.  
-> ✔ Java 8 이후:  `effectively final`개념이 생겨 `final`이 없어도 값이 변경되지 않으면 지역 변수로 취급됨.
+> ✔ Java 8 이후:  `effectively final`개념이 생겨 `final`이 없어도 값이 변경되지 않으면 `final`로 취급됨.
 > 
 > effectively final이란?
-> > 자바에서 final 키워드가 선언되지 않은 변수지만, 값이 재할당되지 않아 final 과 유사하게 동작하는 것을 effectively final이라고 한다. 이 개념은 자바 8에서 도입되었는데, 익명 클래스(Anonymous Classes) 또는 람다식(Lambda Expressions)이 사용된 코드에서 쉽게 찾아볼 수 있다. 익명 클래스 또는 람다식에서는 참조하는 외부 지역 변수가 final로 선언됐거나 선언된 후 참조가 변경되지 않는 effectively final인 경우에만 접근 가능하다. 예를 들어 아래 예제와 같이 참조하는 지역 변수가 내부에서 변경된다면 “local variables referenced from a lambda expression must be final or effectively final” 오류 메시지와 함께 컴파일 에러가 발생한다.
+> > 자바에서 final 키워드가 선언되지 않은 변수지만, 값이 재할당되지 않는 경우 final 과 유사하게 동작하는 것을 effectively final이라고 한다. 이 개념은 자바 8에서 도입되었는데, 익명 클래스(Anonymous Classes) 또는 람다식(Lambda Expressions)이 사용된 코드에서 쉽게 찾아볼 수 있다. 익명 클래스 또는 람다식에서는 참조하는 외부 지역 변수가 final로 선언됐거나 선언된 후 참조가 변경되지 않는 effectively final인 경우에만 접근 가능하다. 예를 들어 아래 예제와 같이 참조하는 지역 변수가 내부에서 변경된다면 “local variables referenced from a lambda expression must be final or effectively final” 오류 메시지와 함께 컴파일 에러가 발생한다.
 > ```java
 > // Anonymous Classes
 > public void someMethod() {
