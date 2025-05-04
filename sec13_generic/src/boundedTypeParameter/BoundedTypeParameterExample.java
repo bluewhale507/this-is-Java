@@ -1,4 +1,4 @@
-package sec13_generic.boundedTypeParameter;
+package sec13_generic.src.boundedTypeParameter;
 
 public class BoundedTypeParameterExample {
     public static void main(String[] args) {

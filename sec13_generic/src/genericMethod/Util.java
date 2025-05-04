@@ -1,5 +1,5 @@
-package sec13_generic.genericMethod;
-import sec13_generic.genericType.Box;
+package sec13_generic.src.genericMethod;
+import sec13_generic.src.genericType.Box;
 
 public class Util {
     public static <T> Box<T> boxing(T t) {

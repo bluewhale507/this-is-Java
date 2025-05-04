@@ -1,4 +1,4 @@
-package sec13_generic.multiTypeParameter;
+package sec13_generic.src.multiTypeParameter;
 
 public class ProductExample {
     public static void main(String[] args) {

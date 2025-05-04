@@ -67,11 +67,17 @@ public class Box<String> {
     public void String get() { return t; }
 }
 ```
+### 유의사항
+- 기본 자료형을 타입 매개변수에 사용할 수 없다.
+- 타입 매개변수를 static 필드의 타입으로 사용할 수 없다.
+- 제네릭 타입의 배열을 선언할 수 없다.
+- 제네릭으로 선언된 타입인데 일반타입처럼 사용하는 경우 제네릭의 raw 타입을 사용한다.  
+=> 타입 매개변수를 Object로 간주하고 처리한다.
 
 ## 멀티 타입 파라미터
 제네릭 타입은 두 개이상의 멀티 타입 파라미터를 사용할 수 있는데, 이 경우 각 타입 파라미터를 콤마로 구분한다. 아래 예제는 제네릭 타입을 정의하고 객체 생성 및 Getter Setter 호출을 보여준다.
 
-참고 : [Product.java](./multiTypeParameter/Product.java), [ProductExample.java](./multiTypeParameter/ProductExample.java)
+참고 : [Product.java](./src/multiTypeParameter/Product.java), [ProductExample.java](./src/multiTypeParameter/ProductExample.java)
 
 제네릭 타입 변수 선언과 객체 생성을 동시에 할 때 타입 파라미터 자리에 구체적인 타입을 지정하는 코드가 중복해서 나와 다소 복잡해질 수 있는데, JAVA 7 부터 다이아몬드 연산자를 이용해 중복을 줄일 수 있다.
 > JAVA 6 이전 : Product<Tv, String> product = new Product<Tv, String>();  
@@ -85,14 +91,14 @@ public class Box<String> {
 > Box\<Integer> box = \<Integer>boxing(100);      // 타입 파라미터를 명시적으로 Integer으로 지정  
 > Box\<Integer> box = boxing(100);               // 타입 파라미터를 Integer로 추정
 
-참고 : [Util.java](./genericMethod/Util.java), [BoxingMethodExample.java](./genericMethod/BoxingMethodExample.java), 
+참고 : [Util.java](./src/genericMethod/Util.java), [BoxingMethodExample.java](./src/genericMethod/BoxingMethodExample.java), 
 
 다음 예제는 Util 클래스에 정적 제네릭 메소드로 compare()를 정의하고, 두 개의 Pair를 매개값으로 받아 K와 V값이 동일한지 검사하고 boolean 값을 리턴한다.
 
-참고 : [Util.java](./genericMethod/Util.java), [CompareMethodExample.java](./genericMethod/CompareMethodExample.java)
+참고 : [Util.java](./src/genericMethod/Util.java), [CompareMethodExample.java](./src/genericMethod/CompareMethodExample.java)
 
 ### 유의사항
-> 타입 파라미터는 반환타입과는 별개로, 메서드 선언 앞에 <>로 반드시 선언해 주어야 한다. 자바 컴파일러는 메서드를 볼 때 이 메서드에서 어떤 제네릭 타입(T, K, V 등)을 쓸 건지 그리고 드 타입파라미터가 어디서부터 나왔는지(메서드 자체의 것인지, 클래스로부터 왔는지)를 구분해야 한다. 그래서 반환타입 앞에 타입 파라미터 선언이 꼭 필요하다.
+> 타입 파라미터는 반환타입과는 별개로, 메서드 선언 앞에 <>로 반드시 선언해 주어야 한다. 자바 컴파일러는 메서드를 볼 때 이 메서드에서 어떤 제네릭 타입(T, K, V 등)을 쓸 건지 그리고 그 타입파라미터가 어디서부터 나왔는지(메서드 자체의 것인지, 클래스로부터 왔는지)를 구분해야 한다. 그래서 반환타입 앞에 타입 파라미터 선언이 꼭 필요하다.
 > ```java
 > public static <T> Box<T> boxing(T t) {...}
 > ```
@@ -109,7 +115,7 @@ public <T extends Number> int compar(T t1, T t2) {
 ```
 위 예제처럼 타입 파라미터 T에 지정될 수 있는 구체적인 타입은 Number 클래스, Number의 하위 클래스, Number의 구현체, Number 하위 클래스의 구현체 등이 있다. <u style="color:red">***주의할 점으로 Number의 하위 타입을 T에 지정하더라도, Number에 존재하는 멤버(필드, 메소드)로 제한되며, Number의 하위타입에만 있는 연산은 사용이 불가능하다.***</u>
 
-참고 : [Util.java](./boundedTypeParameter/Util.java), [BoundedTypeParameterExample.java](./boundedTypeParameter/BoundedTypeParameterExample.java)
+참고 : [Util.java](./src/boundedTypeParameter/Util.java), [BoundedTypeParameterExample.java](./src/boundedTypeParameter/BoundedTypeParameterExample.java)
 
 ## 와일드카드 타입 <?>
 코드에서 일반적으로 ?를 와일드카드라고 부른다. 제네릭 타입을 매개값이나 리턴 타입으로 사용할 때 구체적인 타입 대신에 와일드 카드를 다음과 같이 세 가지 형태로 사용할 수 있다.  
@@ -126,7 +132,7 @@ public <T extends Number> int compar(T t1, T t2) {
 타입 파라미터를 대치하는 구체적인 타입으로 `하위 타입`위치에 기술된 클래스나 그 클래스의 상위 타입만 올 수 있다.   
 *`<? super Number> 인경우 Number 자기자신 혹은 그 조상 타입만 사용가능`*
 
-참고 : [WildCardExample.java](./wildcardsType/WildCardExample.java), [Course.java](./wildcardsType/Course.java)
+참고 : [WildCardExample.java](./src/wildcardsType/WildCardExample.java), [Course.java](./src/wildcardsType/Course.java)
 
 ## 제네릭 타입의 상속과 구현
 제네릭 타입도 다른 타입과 마찬가지로 부모 클래스가 될 수 있다. 다음은 Product<K, V> 제네릭 타입을 상속해서 ChildProduct<T, M> 타입을 정의한다. 자식 제네릭은 추가적으로 타입 파라미터를 가질 수 있다.  

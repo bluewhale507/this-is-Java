@@ -1,4 +1,4 @@
-package sec13_generic.wildcardsType;
+package sec13_generic.src.wildcardsType;
 
 public class Course<T> {
     private String name;

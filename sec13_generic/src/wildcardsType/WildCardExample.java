@@ -1,6 +1,5 @@
-package sec13_generic.wildcardsType;
+package sec13_generic.src.wildcardsType;
 
-import javax.swing.text.Highlighter;
 import java.util.Arrays;
 
 public class WildCardExample {

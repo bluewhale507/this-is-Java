@@ -1,4 +1,4 @@
-package sec13_generic.genericMethod;
+package sec13_generic.src.genericMethod;
 
 public class Pair<K, V> {
     private K key;
