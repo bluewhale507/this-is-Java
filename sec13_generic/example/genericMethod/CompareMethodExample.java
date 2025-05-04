@@ -1,4 +1,4 @@
-package sec13_generic.src.genericMethod;
+package sec13_generic.example.genericMethod;
 
 public class CompareMethodExample {
     public static void main(String[] args) {

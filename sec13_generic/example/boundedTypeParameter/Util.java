@@ -1,4 +1,4 @@
-package sec13_generic.src.boundedTypeParameter;
+package sec13_generic.example.boundedTypeParameter;
 
 public class Util {
     public static <T extends Number> int compare(T t1, T t2) {

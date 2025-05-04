@@ -1,4 +1,4 @@
-package sec13_generic.src.genericType;
+package sec13_generic.example.genericType;
 
 public class Box<T> {
     private T t;

@@ -1,4 +1,4 @@
-package sec13_generic.src.multiTypeParameter;
+package sec13_generic.example.multiTypeParameter;
 
 public class Product<T, M> {
     private T kind;

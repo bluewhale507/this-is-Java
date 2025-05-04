@@ -1,4 +1,4 @@
-package sec13_generic.src.wildcardsType;
+package sec13_generic.example.wildcardsType;
 
 public class Person {
     private String name;

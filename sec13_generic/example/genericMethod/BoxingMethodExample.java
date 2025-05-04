@@ -1,5 +1,5 @@
-package sec13_generic.src.genericMethod;
-import sec13_generic.src.genericType.Box;
+package sec13_generic.example.genericMethod;
+import sec13_generic.example.genericType.Box;
 
 public class BoxingMethodExample {
     public static void main(String[] args) {
