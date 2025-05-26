@@ -59,7 +59,7 @@ public class Box<T> {
 ```
 타입 파라미터를 사용해서 Object 타입을 모두 T로 대체했다. T는 Box 클래스로 객체를 생성할 때 구체적인 타입으로 변경된다. 예를들어 다음과 같이 Box 객체를 생성했다고 가정한다면, 타입 파라미터 T는 String으로 변경되어 Box 클래스의 내부는 아래와 같이 자동으로 재구성 된다. 그로인해 저장할 때와 읽어올 때 타입변환이 전혀 발생하지 않는다.
 ```java
-Box<String> box = new Box<String>();
+Box <String> box = new Box<String>();
 
 public class Box<String> {
     private String t;
@@ -85,7 +85,7 @@ public class Box<String> {
 
 ## 제네릭 메소드
 매개 타입과 리턴 타입으로 타입 파라미터를 갖는 메소드를 제네릭 메소드라고 한다. 선언 방법은 리턴타입 앞에 <> 기호를 추가하고 타입 파라미터를 기술한 다음, 리턴 타입과 매개 타입으로 파라미터를 사용하면 된다.
-> public <T> Box boxing(T t) { ... }
+> public \<T> Box boxing(T t) { ... }
 
 제네릭 메소드는 타입 파라미터의 구체적인 타입을 명시적으로 지정해도 되고, 컴파일러가 매개값의 타입을 보고 구체적인 타입을 추정하도록 할 수도 있다.  
 > Box\<Integer> box = \<Integer>boxing(100);      // 타입 파라미터를 명시적으로 Integer으로 지정  
@@ -135,7 +135,7 @@ public <T extends Number> int compar(T t1, T t2) {
 참고 : [WildCardExample.java](./example/wildcardsType/WildCardExample.java), [Course.java](./example/wildcardsType/Course.java)
 
 ## 제네릭 타입의 상속과 구현
-제네릭 타입도 다른 타입과 마찬가지로 부모 클래스가 될 수 있다. 다음은 Product<K, V> 제네릭 타입을 상속해서 ChildProduct<T, M> 타입을 정의한다. 자식 제네릭은 추가적으로 타입 파라미터를 가질 수 있다.  
+제네릭 타입도 다른 타입과 마찬가지로 부모 클래스가 될 수 있다. 그러나 클래스의 상속과 같이 제네릭 타입 간 명시적인 상속이 정의되어 있지 않으면 서로 형변환이 불가능하다. 다음은 Product<K, V> 제네릭 타입을 상속해서 ChildProduct<T, M> 타입을 정의한다. 자식 제네릭은 추가적으로 타입 파라미터를 가질 수 있다.  
 > public class ChildProduct<T, M, C> extends Product<T, M> { ... }
 
 ```java
