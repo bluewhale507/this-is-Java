@@ -1,4 +1,4 @@
-package sec10_exception.TryWithResource;
+package sec10_exception.example.TryWithResource;
 
 public class TryWithResourceExample {
     public static void main(String[] args) {

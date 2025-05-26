@@ -1,4 +1,4 @@
-package sec10_exception.CustomException;
+package sec10_exception.example.CustomException;
 
 public class AccountExample {
     public static void main(String[] args) {

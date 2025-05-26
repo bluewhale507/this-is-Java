@@ -1,4 +1,4 @@
-package sec10_exception;
+package sec10_exception.example;
 
 //java7이상부터 다중 catch문 지원 이 이하 버전은 catch문을 여러번 사용해야함.
 public class MultiCatchExample {

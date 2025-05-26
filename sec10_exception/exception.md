@@ -23,7 +23,7 @@ public class NullPointerExample {
 자바는 이런 예외들을 클래스로 관리하며, JVM은 실행도중에 예외가 발생하면 해당 예외 클래스로 객체를 생성한다. 그 후 예외 처리 부분에서 객체를 이용할 수 있도록 넘겨준다.
 
 ## 실행 예외
-실행 예외는 컴파일러가 체크하지 않기 때문에 개발자의 경험에 의해 예외처리 코드를 작성해야 한다. 그러나 요새는 IDE가 워낙 좋아져서 경고해주기도 한다.
+<u style="color:red;">**실행 예외는 컴파일러가 체크하지 않기 때문에 개발자의 경험에 의해 예외처리 코드를 작성해야 한다.**</u> 그러나 요새는 IDE가 워낙 좋아져서 경고해주기도 한다.
 ### NullPointerException
 가장 빈번하게 발생하는 실행 예외는 java.lang.NullPointerException로 객체 참조가 없는상태의 참조변수로 도트연산자를 사용했을 때 발생한다.
 ```java
@@ -120,7 +120,7 @@ try {
 ```
 
 ## 자동 리소스 닫기
-자바 7에서 새로 추가된 try-with-resources를 사용하면 예외 발생 여부와 상관없이 사용했던 리소스 객체*각종 입출력 스트림, 서버 소켓, 소켓, 각종 채널)의 close()메소드를 호출해서 안전하게 리소스를 닫아준다.
+자바 7에서 새로 추가된 try-with-resources를 사용하면 예외 발생 여부와 상관없이 사용했던 리소스 객체(각종 입출력 스트림, 서버 소켓, 소켓, 각종 채널)의 close()메소드를 호출해서 안전하게 리소스를 닫아준다.
 다음은 자바6 이전까지 사용해왔던 안전한 리소스 종료를 위한 코드이다.
 ```java
 FileInputStream fis = null;
@@ -138,13 +138,13 @@ try {
 finally 블록에서 다시 try-catch를 상요해서 close() 메소드를 예외 처리해야 하므로 다소 복잡하게 보인다. 자바 7에서 추가된 try-with-resources를 사용하면 아래와 같이 간단해진다.
 
 ```java
-import sec10_exception.TryWithResource.FileInputStream;
+import sec10_exception.example.TryWithResource.FileInputStream;
 
 import java.io.IOException;
 
     try(FileInputStream fis = new FileInputStream("file.txt")){
         ...
-        }catch(IOException) {
+        }catch(IOException){
         ...
         }
 ```
@@ -227,7 +227,7 @@ Throw new Exception();
 다음은 잔고가 부족한 경우 BalanceInsufficientException을 발생 시키는 예제이다.
 
 ```java
-import sec10_exception.CustomException.BalanceInsufficientException;
+import sec10_exception.example.CustomException.BalanceInsufficientException;
 
 public class Account {
     private long balance;
@@ -244,8 +244,8 @@ public class Account {
     }
 
     public void withdraw(int money) throws BalanceInsufficientException {
-        if(balance < money ) {
-            throw new BalanceInsufficientException("잔고부족:"+(money-balace)+"모자람");   // 예외 발생시키면, 메소드는 예외를 호출한 곳으로 throws한다.
+        if (balance < money) {
+            throw new BalanceInsufficientException("잔고부족:" + (money - balace) + "모자람");   // 예외 발생시키면, 메소드는 예외를 호출한 곳으로 throws한다.
         }
         balace -= money;
     }
@@ -253,4 +253,76 @@ public class Account {
 ```
 
 ## 예외 정보 얻기
-try 블록에서 예외가 발생되면 예외 객체는 catch 블록의 매개변수에서 참조하게 되므로 매개변수를 이용하면 예외 객체의 정보를 알 수 있다. 모든 예외 객체는 Exception 클래스를 상속하기 때문에 Exception이 가지고 있는 메소드들은 모든 예외 객체에서 호출할 수 있다. 그 중에서도 getMessage(예외객체가 가지고 있는 Message 얻기)와 printStackTrace(예외의 발생 경로를 추적)가 많이 사용된다. 예외를 발생시킬 때 String 타입의 메세지를 갖는 생성자를 이용하였다면, 메세지는 자동적으로 객체 내부에 저장된다.
+✅ try-catch 예외 처리와 예외 객체 정보
+try 블록에서 예외가 발생하면,
+→ catch 블록의 매개변수가 해당 예외 객체를 참조하게 됩니다.
+
+모든 예외 클래스는 Exception 클래스의 자식이기 때문에,
+→ Exception 클래스가 제공하는 공통 메소드를 사용할 수 있습니다.
+
+📌 자주 사용되는 예외 객체 메소드
+
+| 메소드                 | 설명                     |
+| ------------------- | ---------------------- |
+| `getMessage()`      | 예외 발생 시 전달한 메시지를 반환    |
+| `printStackTrace()` | 예외가 발생한 위치(경로)를 콘솔에 출력 |
+
+**예시**
+``` java 
+try {
+    // 예외 발생 코드
+} catch (Exception e) {
+    System.out.println(e.getMessage());  // 메시지 확인
+    e.printStackTrace();                 // 경로 추적
+}
+```
+
+## 참고
+> ✅ Checked Exception (체크 예외)
+> 📌 정의
+> 컴파일러가 예외 처리를 강제하는 예외
+>
+> 예외가 발생할 가능성이 있는 코드는 반드시 try-catch로 처리하거나, throws로 던져야 함
+>
+> 📦 대표 예외 클래스  
+> - IOException  
+> - SQLException  
+> - FileNotFoundException  
+> - ClassNotFoundException  
+>
+> ✅ 예시
+> ```java
+> public void readFile(String path) throws IOException {
+> FileReader reader = new FileReader(path); // FileNotFoundException
+> }
+> ```
+> → IOException은 Checked 예외이므로, 처리하지 않으면 컴파일 에러 발생
+
+> ✅ Unchecked Exception (언체크 예외)
+> 📌 정의
+> 컴파일러가 예외 처리 강제를 하지 않음
+>
+> 대부분 프로그래머의 실수로 발생하는 논리 오류. 예외 처리를 강제하지 않지만, 런타임 중 예외가 발생하면 프로그램이 중단됨
+> 
+> 📦 대표 예외 클래스  
+> - NullPointerException  
+> - ArrayIndexOutOfBoundsException  
+> - ArithmeticException  
+> - IllegalArgumentException  
+>
+> ✅ 예시
+> ```java
+> public void divide(int a, int b) {
+> int result = a / b; // b가 0이면 ArithmeticException
+> }
+> ```
+>→ try-catch 없이도 컴파일되지만, 실행 중 예외가 발생하면 프로그램이 종료됨
+
+> 🔍 두 예외의 차이 정리
+> 
+> | 항목          | Checked Exception       | Unchecked Exception |
+> | ----------- | ----------------------- | ------------------- |
+> | 검사 시점       | 컴파일 타임                  | 런타임                 |
+> | 예외 처리 강제 여부 | 예 (try-catch 또는 throws) | 아니오                 |
+> | 주로 발생 원인    | 외부 환경(입출력, DB 등)        | 프로그래머의 실수, 논리 오류    |
+> | 상속 클래스      | `Exception`             | `RuntimeException`  |

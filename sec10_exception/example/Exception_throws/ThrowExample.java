@@ -1,4 +1,4 @@
-package sec10_exception.Exception_throws;
+package sec10_exception.example.Exception_throws;
 
 public class ThrowExample {
     public static void main(String[] args) {

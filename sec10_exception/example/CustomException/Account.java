@@ -1,4 +1,4 @@
-package sec10_exception.CustomException;
+package sec10_exception.example.CustomException;
 
 public class Account {
     private long balance;
