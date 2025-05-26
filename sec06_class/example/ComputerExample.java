@@ -1,4 +1,4 @@
-package sec06_class;
+package sec06_class.example;
 
 public class ComputerExample {
     public static void main(String[] args) {

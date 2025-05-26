@@ -1,4 +1,4 @@
-package sec06_class.annotation;
+package sec06_class.example.annotation;
 
 import java.lang.reflect.Method;
 
