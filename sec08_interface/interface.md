@@ -27,7 +27,7 @@
 > }  
 
 #### 상수필드(Constant Field) => [절대적 - 인터페이스에서 제공해주는 값을 참조만 할 것]
-> 인터페이스는 객체사용 설명서이므로 런타임 시 데이털르 저장할 수 있는 필드를 선언할 수 없지만, 상수필드는 선언이 가능하다. 상수는 인터페이스에 고정된 값이므로 데이터를 변경할 수 없고 반드시 초기값을 대입해야 한다.
+> 인터페이스는 객체사용 설명서이므로 런타임 시 데이터를 저장할 수 있는 필드를 선언할 수 없지만, 상수필드는 선언이 가능하다. 상수는 인터페이스에 고정된 값이므로 데이터를 변경할 수 없고 반드시 초기값을 대입해야 한다.
 
 #### 추상 메소드(Abstract Method) => [강제적 - 가이드만 줄테니 반드시 재정의할 것]
 > 추상 메소드는 객체가 가지고 있는 메소를 설명한 것으로 호출할 때 어떤 매개값이 필요하고, 리턴 타입이 무엇인지만 알려준다. 실제 실행부는 구현객체가 가지고 있다.
@@ -50,6 +50,7 @@ public interface RemoteControl {
 ### 추상 메소드 선언  
 <img src="img/interface_02.png" width="100%" style="display: block; margin: 0 auto;">  
 인터페이스를 통해 호출된 메소드는 최종적을 객체에서 실행된다. 그렇기 때문에 인터페이스의 메소드는 실행 블록이 필요없는 추상메소드로 선언한다. 인터페이스에 선언된 추상 메소드는 모두 public abstract의 특성을 갖기 때문에 생략하더라도 컴파일러가 붙여준다.
+
 ```java
 public interface RemoteControl {
     // 상수
@@ -169,7 +170,7 @@ public class RemoteControlExample {
     }
 }
 ```
-f
+
 참고 : [Audio.java](./example/interface_elements_use/Audio.java)(인터페이스 구현 클래스), [Television.java](./example/interface_elements_use/Audio.java)(인터페이스 구현 클래스), [RemoteControlExample.java](./example/interface_elements_use/RemoteControlExample.java)(인터페이스 사용 클래스)
 
 ## 타입 변환과 다형성
@@ -267,4 +268,10 @@ if(vehicle instanceof Bus) {
 궁금해서 정리해 둔 관련 글  
 참고 : [상속과 합성](https://blog.naver.com/0908f/222953688943)
 
+## 참고
+> 인터페이스의 모든 메서드는 기본적으로 명시하지 않아도`public abstract`가 붙으며 모든 필드 또한 별도의 명시 없이도 `public static final` 이 붙는다.
+
+> 인터페이스에는 인스턴스 필드나 생성자 포함이 불가능 하고, java8 부터는 default, static 메소드를 허용하고, java9 부터는 default 메서드 내부에서 private 메서드를 사용할 수 있다.
+
+> 인터페이스를 구성하기 위한 최소 요건은 interface 키워드로 선언되어야 하는 것이며, 내부 멤버는 없어도 유효하다.
 ## [연습문제 풀이](./ChapterTest.md)

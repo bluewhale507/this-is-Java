@@ -205,7 +205,7 @@ int hour = now.get(Calendar.HOUR);
 int minute = now.get(Calendar.MINUTE);
 int second = now.get(Calendar.SECOND);
 ```
-그러면 Calendar를 이용해서 오늘의 요일을 얻고, 열거타입 변수 today에 해당 열거 상수를 대입하는 예제를 살펴보자.
+그러면 Calendar를 이용해서 오늘의 요일을 얻고, 열거타입 변수 today에 각 날짜에 해당하는 Calendar 추상클래스의 상수를 대입하는 예제를 살펴보자.
 ```java
 import java.util.Calendar;
 
@@ -311,5 +311,49 @@ public class EnumWeekExample {
 >   System.out.println(day);
 > }
 > ```
+
+## 참고
+> #### enum 상수는 반드시 가장 먼저 나와야 함
+> 상수 뒤에는 ;가 있거나 없을 수 있음 (있으면 필드/메서드 정의 가능), 상수 뒤에 다른 필드/메서드가 온다면 ;를 반드시 붙여야 함. 즉, 열거 타입 내부 일반 필드나 메서드의 선언이 가능하다. 그러나 그 위치는 반드시 열거 상수 뒤여야 한다.
+>
+> ```java
+> public enum Day {
+> MON, TUE, WED; // 세미콜론 필수 (아래에 필드/메서드 있으므로)
+>
+>    private String label;
+>
+>    public String getLabel() {
+>        return label;
+>    }
+> }
+> ```
+
+> #### ✅ 메시지 등 부가 정보가 필요한 경우
+> ```java
+> public enum Status {
+> SUCCESS("성공"), FAIL("실패");
+>     private final String message;
+>     Status(String message) {
+>         this.message = message;
+>     }
+>
+>     public String getMessage() {
+>         return message;
+>     }
+> }
+> ```
+> 
+> 사용 예:
+> ```java
+> System.out.println(Status.SUCCESS.getMessage()); // → "성공"
+> ```
+> 👉 부가 설명, 코드, 메시지 등을 함께 관리하고 싶을 때 사용합니다.
+> 
+>| 상황                  | enum 형태         | 설명          |
+>| ------------------- | --------------- | ----------- |
+>| 단순 상태 구분만 필요할 때     | `SUCCESS, FAIL` | 가볍고 직관적     |
+>| 상태마다 메시지나 속성이 필요할 때 | `SUCCESS("성공")` | 생성자 + 필드 사용 |
+> 따라서, 필요에 따라 선택하면 된다.  
+> “값이 필요 없다면 단순 상수로, 값이 필요하면 생성자와 필드로” 구성.
 
 ## [연습문제 풀이](./ChapterTest.md)
