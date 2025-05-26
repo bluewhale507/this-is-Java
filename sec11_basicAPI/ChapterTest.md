@@ -8,7 +8,7 @@
 답 : ④ Object의 재정의되지 않은 기본 toString()은 `[클래스 이름]@[16진수 해시코드]`이다.
 
 ### 2. 작성한 클래스를 동등비교하는 컬렉션 객체인 HashSet, HashMap, Hashtable을 사용하려고 한다. Object의 equals()와 hashCode() 메소드를 오버라이딩 햇다고 가정할 경우, 메소드 호출순서를 생각해 다음 괄호를 채우시오.
-<img src="basicAPI_02.png" width="70%" style="display: block; margin: 0 auto;">
+<img src="img/basicAPI_02.png" width="70%" style="display: block; margin: 0 auto;">
 답 : hashCoe(), equals()순으로 동등검사를 한다. 둘다 같아야 논리적으로 동등한 객체로 평가한다.
 
 ### 3. Student 클래스를 작성하되, Object의 equals()와 hashCode()를 오버라이딩 해서 Student의 학번(StudentNum)이 같으면 동등객체가 될 수 있도록 작성하라.

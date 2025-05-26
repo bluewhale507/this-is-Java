@@ -5,7 +5,7 @@
 ### java.lang 패키지
 >java.lang 패키지는 문자열 처리, 수학 연산, 스레드 처리 ,예외 처리, 기본 자료형 클래스와 같은 자바 프로그램의 기본적인 클래스를 담고 있는 패키지이다. 그러므로 import 없이 사용할 수 있다. 아래 나열된 클래스 외에도 Exception, Error, Enum, Throwable 같은 클래스도 속해있다.
 
-<img src="basicAPI_01.png" width="100%">
+<img src="./img/basicAPI_01.png" width="100%">
 
 ### java.util 패키지
 > 컬렉션 프레임워크, 날짜 및 시간 클래스, 랜덤 및 난수 생성과 관련한 중요한 유틸리티 클래스들을 제공하며 데이터 구조와 관련된 많은 기능을 제공한다.
@@ -41,7 +41,7 @@ public class Member {
 #### 객체 해시코드 (hashCode())
 객체 해시코드란 객체를 식별할 하나의 정수값을 말한다. Object의 hashCode() 메소드는 객체의 메모리 번지를 이용해서 해시코드를 만들어 리턴하기 때문에 객체마다 다른 값을 가지고 있다. hash기반 컬렉션에서 논리적 동등 비교 시 hashCode()를 오버라이딩 할 필요성이 있는데, 컬렉션 프레임워크 중 HashSet, HashMap, Hashtable은 hashCode()를 실행해서 리턴된 결과값을 비교한 후, 같으면 equals()로 다시 비교한다. 둘다 같아야만(true) 동등객체로 판단한다.
 
-<img src="basicAPI_02.png" width="70%" style="display: block; margin: 0 auto;">
+<img src="./img/basicAPI_02.png" width="70%" style="display: block; margin: 0 auto;">
 
 ```java
 public class Key {
@@ -144,7 +144,7 @@ public class ToStringExample {
 얕은복제(thin clone)
 > 얕은복제란 단순히 필드값을 복사해서 객체를 복제하는것을 말한다. 필드가 기본타입일 경우 값 복사가 일어나고, 참조타입일 경우 객체의 번지가 복사된다.(즉 참조타입은 원본과 동일한 객체를 참조한다.) 
 
-<img src="basicAPI_03.png" width="70%" style="display: block; margin: 0 auto;" >
+<img src="./img/basicAPI_03.png" width="70%" style="display: block; margin: 0 auto;" >
 
 이 메소드로 객체를 복제하려면 원본객체는 반드시 java.lang.Cloneable 인터페이스를 구현하고 있어야 한다. 메소드 선언이 없음에도 불구하고 이 인터페이스를 구현하는 이유는 클래슷 설계자가 복제를 허용한다는 의도적인 표시를 하기 위해서이다. 이 인터페이스를 구현하지 않았다면 clone() 메서드를 호출할 때 CloneNotSurpportedException 예외가 발생하여 복제가 실패된다.
 
@@ -177,7 +177,7 @@ public class Member implements Cloneable {
 #### 깊은복제(deep clone)
 얕은 복제의 경우 원본객체에서 참조타입 필드의 번지만 복사하기 때문에 복제객체의 참조타입 필드가 변경된다면 원본 객체도 변경이 되는 단점이 있다. 깊은 복제를 이용하면 참조하고 있는 객체도 복제할 수 있다.
 
-<img src="basicAPI_04.png" width="70%" style="display: block; margin: 0 auto;">
+<img src="./img/basicAPI_04.png" width="70%" style="display: block; margin: 0 auto;">
 
 >깊은 복제를 하려면 Object의 clone() 메소드를 재정의해서 참조 객체를 복제하는 코드를 직접 작성해야 한다.
 
@@ -269,7 +269,7 @@ public class FinalizeExample {
 ### Objects 클래스
 Object와 유사한 이름을 가진 java.util.Objects 클래스는 객제비교, 해시코드생성, null 여부, 객체 문자열 리턴 등의 연산을 수행하는 static 메소드들로 구성된 Object의 유틸리티 클래스이다. s가 붙은 유틸리티 클래스는 일반적으로 객체 생성없이 사용할 수 있도록 만들어 놓은 클래스이다.  
 
-<img src="basicAPI_05.png" width="100%" style="display: block; margin: 0 auto;">
+<img src="./img/basicAPI_05.png" width="100%" style="display: block; margin: 0 auto;">
 
 #### 객체비교(compare(T a, T b, Comparator<T> c))
 Objects.compare(T a, T b, Comparator<T> c) 메소드는 두 객체를 비교자로 비교해서 int값을 리턴한다. java.util.Comparator<T>는 제네릭 인터페이스 타입으로 두 객체를 비교하는 compare<T a, T b> 메소드가 정의되어 있다. compare 메소드의 리턴타입은 int인데, a가b보다 작으면 음수, 크면 양수를 리턴하도록 구현 클래스를 만들어야 한다.
@@ -332,7 +332,7 @@ Objects.hash(Object... values) 메소드는 매개값으로 주어진 값들을 
 
 Objects.hashCode(Object o)는 매개값으로 주어진 객체의 해시코드를 리턴하기 때문에 Object.hashCode()의 리턴값과 동일하다. 아래 참고의 예제는 학생번호와 학생이름을 매개값으로 해서 Objects.hash()메소드를 호출했다. 이 두 필드가 동일하다면 같은 해시코드를 얻을 수 있다.  
 
-참고 : [HashCodeExample.java](./objectsClass/hashcode/HashCodeExample.java)
+참고 : [HashCodeExample.java](./example/objectsClass/hashcode/HashCodeExample.java)
 
 #### 널 여부 조사
 Objects.inNull(Object obj)는 매개값이 null일 경우 true를 리턴한다. 반대로 nonNull(Object)는 매개값이 not null일 경우 true를 리턴한다. requireNonNull()는 다음 세 가지로 오버로딩 되어 있다.
@@ -489,7 +489,7 @@ public class SystemTimeExample {
 #### 시스템 프로퍼티 읽기(getProperty())
 ><u>시스템 프로퍼티(System Property)는 JVM이 시작할 때 자동 설정되는 시스템의 속성값</u>을 말한다. 운영체제의 종류, 자바 프로그램을 실행시킨 사용자 id, JVM의 버전등이 여기에 속한다.
 
-<img src="basicAPI_06.png" width="100%" style="display: block; margin: 0 auto;">
+<img src="./img/basicAPI_06.png" width="100%" style="display: block; margin: 0 auto;">
 
 > 시스템 프로퍼티를 읽어오기 위해서는 System.getProperty() 메소드를 이용하면 된다. 이 메소드는 시스템 프로퍼티의 키 이름을 매개값으로 받고 해당 키에대한 값을 문자열로 리턴한다.
 
@@ -669,10 +669,10 @@ public class ReflectionExample {
 > 이러한 경우, newInstance()로 생성할 동적객체들이 공통으로 가지는 연산을 동적객체들의 슈퍼타입이되는 부모클래스나, 인터페이스로 구현해두고 동적객체를 생성한 후 이 인터페이스나 부모클래스로 Casting한다.
 
 참고 :  
-[NewInstanceExample.java](./newInstance/NewInstanceExample.java)  
-[Action.java](./newInstance/Action.java)  
-[ReceiveAction.java](./newInstance/ReceiveAction.java)  
-[SendAction.java](./newInstance/SendAction.java)  
+[NewInstanceExample.java](./example/newInstance/NewInstanceExample.java)  
+[Action.java](./example/newInstance/Action.java)  
+[ReceiveAction.java](./example/newInstance/ReceiveAction.java)  
+[SendAction.java](./example/newInstance/SendAction.java)  
 
 > 현재 Class 객체에 바로 .newInstance()를 사용하는건 JAVA9 이후로 deprecated 되었다. 대신 위 예제처럼 Constructor 객체를 이용해 동적객체를 생성하는 방법이 권장된다.
 
@@ -749,7 +749,7 @@ public class KeyboardToStringExample {
 ```
 어떤 문자셋으로 인코딩하느냐에 따라 배열의 크기가 달라진다. 인자로 잘못된 문자셋을 넘겨주는 경우 java.io.UnsupportedEncodingException이 발생하므로 예외처리가 필요하다. 바이트 배열을 다시 문자열로 디코딩할 때는 생성자의 인자로 넘겨주면 된다.
 
-참고 : [StringGetBytesExample.java](./StringExample/StringGetBytesExample.java)
+참고 : [StringGetBytesExample.java](./example/StringExample/StringGetBytesExample.java)
 
 ##### 문자열 찾기(indexOf())
 > indexOf() 메소드는 매개값으로 주어진 문자열이 시작되는 인덱스를 리턴한다. 만약 주어진 문자열이 포함되어 있지 않으면 -1을 리턴한다. indexOf() 메소드는 if문의 조건식에서 특정 문자열이 포함되어 있는지 여부에 따라 실행을 달리할 때 자주 사용된다.
@@ -761,7 +761,7 @@ if(문자열.indexOf("찾는문자열") == -1) {
 }
 ```
 
-참고 : [StringIndexOfExample.java](./StringExample/StringIndexOfExample.java)
+참고 : [StringIndexOfExample.java](./example/StringExample/StringIndexOfExample.java)
 
 ##### 문자열 대치(replace())
 replace() 메소드는 첫 번째 매개값인 문자열을 찾아 두 번째 매개값인 문자열로 대치한 새로운 문자열을 생성하고 리턴한다. String은 불변이 특성을 가지고 있기 때문에 이 메소드가 리턴하는 문자열은 기본 문자열의 수정본이 아닌 완전히 새로운 문자열이다.
@@ -958,7 +958,7 @@ public class StringBuilderExample {
 
 #### 정규표현식 작성 방법
 
-<img src="basicAPI_07.png" width="100%">  
+<img src="./img/basicAPI_07.png" width="100%">  
 
 ##### 전화번호를 위한 정규 표현식(02-xxx-xxxx or 010-xxxx-xxxx)
 > (02|010)-\d{3,4}-\d{4}  
@@ -1136,7 +1136,7 @@ public class SortExample {
 #### 배열 항목 검색
 배열항목에서 특정값이 위치한 인덱스를 얻는것을 배열 검색이라고 한다. 배열 항목을 검색하려면 먼저 Arrays.sort() 메소드로 항목들을 오름차순으로 정렬한 후, Arrays.binarySearch() 메소드로 항목을 찾아야 한다.
 
-참고 : [SearchExmaple.java](./ArraysExample/SearchExample.java)
+참고 : [SearchExmaple.java](./example/ArraysExample/SearchExample.java)
 
 ## Wrapper(포장) 클래스
 자바는 기본 타입의 값을 갖는 객체를 생성할 수 있다. 기본 타입의 값을 내부 필드로 둔 객체를 생성하여 기본타입을 참조타입과 같이 이용하기 때문에 이런 객체를 포장객체라고 한다. 포장 객체의 특징은 포장하고 있는 기본 타입 값은 외부에서 변경할 수 없다는 것이다. 만약 내부의 값을 변경하고 싶다면 새로운 포장 객체를 만들어야한다. 포장 클래스는 java.lang 패키지에 포함되어 있는데, 아래와 같이 기본 타입에 대응되는 클래스들이 있다.  
@@ -1772,7 +1772,7 @@ public class DateTimeInfoExample {
 }
 ```
 
-<img src="basicAPI_08.png" width="60%">
+<img src="./img/basicAPI_08.png" width="60%">
 
 ### 날짜와 시간을 조작하기
 날짜와 시간 클래스들은 날짜와 시간을 조작하는 메소드와 상대 날짜를 리턴하는 메소드들을 가지고 있다.  
@@ -2013,7 +2013,7 @@ public class DateTimeCompareExample {
 }
 ```
 
-<img src="basicAPI_09.png"  width="30%">
+<img src="./img/basicAPI_09.png"  width="30%">
 
 ### 파싱과 포맷팅
 날짜와 시간 클래스는 문자열을 파싱해서 날짜와 시간을 생성하는 메소드와 이와 반대로 날짜와 시간을 포맷팅된 문자열로 변환하는 메소드를 제공하고 있다. 
