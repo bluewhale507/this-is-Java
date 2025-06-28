@@ -6,7 +6,8 @@ public class DataBox {
     public synchronized String getData() {
         if(this.data == null) {
             try {
-                wait();
+                System.out.println("ConsumerThread 대기중...");
+                wait(1000);  // 1초간 wait 후 깨어남 (데이터 없으면 다시 대기)
             } catch (InterruptedException e) {}
         }
         String returnValue = data;

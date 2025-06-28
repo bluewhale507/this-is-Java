@@ -666,3 +666,366 @@ public class joinExample {
 ```
 
 ## 스레드 간 협업(wait(), notify(), notifyAll())
+경우에 따라서는 두 개의 스레드를 교대로 번갈아가며 실행해야 할 경우가 있다. 정확한 교대 작업이 필요한 경우, 자신의 작업이 끝나면 상대방 스레드를 일시 정지 상태에서 풀어주고, 자신은 일시 정지 상태로 만드는 것이다. 이 방법의 핵심은 공유 객체에 있다. 공유 객체는 두 스레드가 작업할 내용을 각각 동기화 메소드로 구분해 놓는다. ***한 스레드가 작업을 완료하면 notify() 메소드를 호출해서 일시 정지 상태에 있는 다른 스레드를 실행 대기 상태로 만들고, 자신은 두 번 작업을 하지 않도록 wait() 메소드를 호출하여 일시 정지 상태로 만든다.***
+
+<img src="img/multiThread_11.png" style="display:block; margin: 0 auto" width=80%>
+
+만약 wait() 대신 wait(long timeout)이나, wait(long timeout, int nanos)를 사용하면 notify()를 호출하지 않아도 지정된 시간이 지나면 자동적으로 실행 대기 상태가 된다. notify() 메소드와 동일한 역할을 하는 notifyAll()도 있는데, notify()는 wait()에 의해 일시정지된 스레드 중 한 개를 실행 대기 상태로 만들고, notifyAll() 메소드는 wait()에 의해 일시 정지된 모든 스레드들을 실행 대기 상태로 만든다. 이 메소드들은 ***Thread 클래스가 아닌 Object 클래스에 의해 선언된 메소드들이므로, 모든 공유 객체에서 호출이 가능하다. 주의할 점은 이 메소드들은 동기화 메소드 또는 동기화 블록 내에서만 사용할 수 있다.***  
+
+> 다음 예제는 두 스레드의 작업을 WorkObject의 methodA()와 methodB()에 정의해 두고, 두 스레드 ThreadA와 ThreadB가 교대로 methodA()와 methodB()를 호출하도록 했다.  
+
+```java
+/* WorkObject.java - 두 스레드의 작업 내용을 동기화 메소드로 작성한 공유 객체 */
+public class WorkObject {
+    public synchronized void methodA() {
+        System.out.println("ThreadA의 methodA() 작업 실행");
+        notify();
+        try {
+            wait();
+        } catch (InterruptedException e) {}
+    }
+    
+    public synchronized void methodB() {
+        System.out.println("ThreadB의 methodB() 작업 실행");
+        notify();
+        try {
+            wait();
+        } catch (InterruptedException e) { }
+    }
+}
+
+/* ThreadA.java - WorkObject의 methodA()를 실행하는 스레드 */
+public class ThreadA extends Thread {
+    private WorkObject workObject;
+    
+    public ThreadA(WorkObejct workObject) {
+        this.workObject = workObject;
+    }
+    
+    @Override
+    public void run() {
+        for(int i=0; i<10; i++) {
+            workObject.methodA();
+        }
+    }
+}
+
+/* ThreadA.java - WorkObject의 methodB()를 실행하는 스레드 */
+public class ThreadB extends Thread {
+    private WorkObject workObject;
+    
+    public ThreadA(WorkObejct workObject) {
+        this.workObject = workObject;
+    }
+    
+    @Override
+    public void run() {
+        for(int i=0; i<10; i++) {
+            workObject.methodB();
+        }
+    }
+}
+
+/* WaitNotifyExample.java - 두 스레드를 생성하고 실행하는 메인 스레드 */
+public class WaitNotifyExample {
+    public static void main(String[] args) {
+        WorkObject sharedObject = new WorkObject();
+        
+        ThreadA threadA = new ThreadA(sharedObject);
+        ThreadB threadB = new ThreadB(sharedObject);
+
+        threadA.start();
+        threadB.start();
+    }
+}
+```
+
+> 다음 예제는 데이터를 저장하는 스레드 (생산자 스레드)가 데이터를 저장하면, 데이터를 소비하는 스레드 (소비자 스레드)가 데이터를 읽고 처리하는 교대 작업을 구현한 것이다.  
+
+<img src="img/multiThread_12.png" style="display:block; margin: 0 auto" width=80%>
+
+생산자 스레드는 소비자 스레드가 읽기 전에 새로운 데이터를 두 번 생성하면 안 되고, 소비자 스레드는 생산자 스레드가 새로운 데이터를 생성하기 전에 이전 데이터를 두 번 읽어서도 안 된다. 구현 방법은 공유 객체에 데이터를 저장할 수 있는 data 필드의 값이 null이면 생산자스레드를 실행 대기 상태로 만들고, 소비자 스레드를 일시 정지 상태로 만드는 것이다. 반대로 data 필드의 값이 null이 아니면 소비자 스레드를 실행 대기 상태로 만들고, 생산자 스레드를 일시 정지 상태로 만들면 된다. (세마포어를 이용한 생산자-소비자 문제 해결과 비슷한듯 하다.)  
+
+```java
+/* DataBox.java - 두 스레드의 작업 내용을 동기화 메소드로 작성한 공유 객체 */
+public class DataBox {
+    private String data;
+    
+    public synchronized String getData() {
+        if(this.data == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {}
+        }
+        String returnValue = data;
+        System.out.println("ConsumerThread가 읽은 데이터: " + returnValue);
+        data = null;
+        notify();
+        return returnValue;
+    }
+    
+    public synchronized void setData(String data) {
+        if(this.data != null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {}
+        }
+        this.data = data;
+        System.out.println("ProducerThread가 생성한 데이터: " + data);
+        notify();
+    }
+}
+
+/* ProducerThread.java - 데이터를 생산하는 스레드 */
+public class ProducerThread extends Thread {
+    private DataBox dataBox;
+    
+    public ProducerThread(DataBox dataBox) {
+        this.dataBox = dataBox;
+    }
+    
+    @Override
+    public void run() {
+        for(int i=1; i<=3; i++) {
+            String data = "Data-"+i;
+            dataBox.setData();
+        }
+    }
+}
+
+/* ConsumerThread.java - 데이터를 소비하는 스레드 */
+public class ConsumberThread extends Thread {
+    private DataBox dataBox;
+    
+    public ConsumberThread(DataBox dataBox) {
+        this.dataBox = dataBox;
+    }
+    
+    @Override
+    public void run() {
+        for(int i=1; i<=3; i++) {
+            String data = "Data-"+i;
+            dataBox.getData();
+        }
+    }
+}
+
+/* WaitNotifyExample.java - 두 스레드를 생성하고 실행하는 메인 스레드 */
+public class WaitNotifyExample {
+    public static void main(String[] args) {
+        DataBox dataBox = new DataBox();
+        
+        ProducerThread producerThread = new ProducerThread(dataBox);
+        ConsumberThread consumberThread = new ConsumberThread(dataBox);
+        
+        producerThread.start();
+        consumberThread.start();
+    }
+}
+```
+
+## 스레드의 안전한 종료(stop 플래그, interrupt()) 
+스레드는 자신의 run() 메소드가 모두 실행되면 자동적으로 종료된다. 경우에 따라서는 실행중인 스레드를 즉시 종료할 필요가 있다. Thread는 스레드를 즉시 종료 시키기 위해서 stop() 메소드를 제공하고 있는데, 이 메소드를 이용해 스레드를 갑자기 종료시키게 되면 스레드가 사용중이던 자원이 불안전한 상태로 남겨지기 때문에 `deprecated` 되었다. 스레드를 안전하게 종료시키는 방법은 아래와 같이 두 가지가 있다. 둘 중 빠른 종료가 필요한 경우는 interrupt() 메서드를 호출해서 간접적으로 종료상태로 전이되도록 한다.  
+
+### stop 플래그를 이용하는 방법
+스레드는 run() 메소드가 끝나면 자동적으로 종료되므로, run() 메소드가 정상적으로 종료되도록 유도하는 것이 최선의 방법이다. 다음 코드는 stop 플래그를 이용해서 run() 메소드의 종료를 유도한다.
+
+```java
+public class XXXThread extends Thread {
+    private boolean stop;   // stop 플래그 필드
+    
+    public void run() {
+        while(!stop) {
+            // 스레드가 반복 실행하는 코드
+        }
+        // 스레드가 사용한 자원 정리
+    }
+}
+```
+
+위 코드에서 stop 필드가 false일 경우에는 while문의 조건식이 true가 되어 반복실행하지만, stop 필드가 true일 경우에는 while문의 조건식이 false가 되어 while문을 빠져나온다. 그리고 스레드가 사용한 자원을 정리하고, run() 메소드가 끝나게 됨으로써 스레드는 안전하게 종료된다.  
+
+> 다음 예제는 PrintThread1을 실행한 후 1초 후에 PrintThread1을 멈추도록 setStop() 메소드를 호출한다.  
+
+```java
+/* StopFlagExample.java - 1초 후 출력 스레드를 중지시킴 */
+public class StopFlagExample {
+    public static void main(String[] args) {
+        PrintThread1 = printThread = new PrintThread1();
+        printThread.start();
+        try { Thread.sleep(1000); } catch (InterruptedException e) {}
+        
+        printThread.setStop(true);
+    }
+}
+
+/* PrintThread1.java - 무한 반복해서 출력하는 스레드 */
+public class PrintThread1 extends Thread {
+    private boolean stop;
+    
+    public void setStop(boolean stop) {
+        this.stop = stop;
+    }
+    
+    public void run() {
+        while(!stop) {
+            System.out.println("실행 중");
+        }
+        System.out.println("자원 정리");
+        System.out.println("실행 종료");
+    }
+}
+```
+
+> #### ✅ 실행 흐름 정리
+> 1. main()에서 printThread.setStop(true) 호출 → stop = true로 변경됨  
+> 2. PrintThread1 내부에서 while (!stop) 조건이 false가 되어 루프를 빠져나옴
+> 3. 루프 아래 코드(System.out.println("자원 정리");, System.out.println("실행 종료");) 실행  
+> 4. run() 메서드의 끝까지 도달 → 스레드 종료됨  
+> 
+> => 즉, run() 종료가 곧 스레드의 종료.
+
+### interrupt() 메소드를 이용하는 방법  
+interrupt() 메소드는 스레드가 일시 정지 상태에 있을 때 InterruptedException 예외를 발생시키는 역할을 한다. 이것을 이용하면 run() 메소드를 정상 종료 시킬 수 있다. 
+
+<img src="img/multiThread_13.png" style="display:block; margin: 0 auto" width=80%>
+
+ThreadA가 ThreadB의 interrupt() 메소드를 실행하게 되면 ThreadB가 sleep() 메소드로 이리 정지 상태가 될 때 ThreadB에서 interruptException이 발생하여 예외 처리(catch) 블록으로 이동한다. 결국 ThreadB는 while문을 빠져나와 run() 메소드를 정상 종료하게 된다.  
+
+> 다음 예제는 PrintThread2를 실행한 후 1초 후에 PrntThread2를 멈추도록 interrupt() 메소드를 호출한다. 
+
+```java
+/* InterruptExample - 1초 후 출력 스레드를 중지시킴 */
+public class InterruptExample {
+    public static void main(String[] args) {
+        Thread thread = new PrintThread2();
+        thread.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {}
+
+        thread.interrupt();
+    }
+}
+
+/* PrintThread2.java - 무한 반복해서 출력하는 스레드 */
+public class PrintThread2 extends Thread {
+    public void run() {
+        try {
+            while (true) {
+                System.out.println("실행 중");
+                Thread.sleep(1);
+            }
+        } catch (InterruptedException e) { }
+        
+        System.out.println("자원 정리");
+        System.out.println("실행 종료");
+    }
+}
+```
+
+***주목할 점은 스레드가 실행 대기 또는 실행 상태에 있을 때 interrupt() 메소드가 실행되면 즉시 InterruptedException 예외가 발생하지 않고, 스레드가 미래에 일시 정지 상태가 되면 InterruptedException 예외가 발생한다는 것이다.*** 따라서 스레드가 일시 정지 되지 않으면 interrupt() 메소드 호출은 아무런 의미가 없다. 그래서 짧은 시간이나마 일시 정지시키기 위해 Thread.sleep(1)을 사용한다. 
+
+#### main() 메서드에서 Thread.sleep(1000)을 호출하는 이유
+
+> ##### ✅ 목적: PrintThread2가 충분히 실행되도록 하기 위해
+> ``` java
+> try {
+> Thread.sleep(1000);  // ⚠ 메인 스레드가 1초 동안 일시정지
+> } catch (InterruptedException e) {}
+> ```
+> ▶ 이 코드의 역할은 간단히 말해 PrintThread2 스레드가 **“1초 동안 실행될 시간”** 을 보장하기 위함입니다.  
+> 그 후 main()이 interrupt()를 호출해 PrintThread2를 중단시킵니다.
+> 
+> 🔁 만약 이 코드가 없다면?
+> ```java
+> // thread.start();
+> thread.interrupt(); // 거의 즉시 인터럽트됨
+> ```
+> PrintThread2는 아직 실행을 시작하기도 전에 interrupt()를 받게 될 수 있음, 그러면 "실행 중" 메시지도 출력 안 된 채 즉시 종료되거나 비정상 흐름이 될 수 있음
+
+일시 정지를 만들지 않고도 interrupt() 호출 여부를 알 수 있는 방법이 있다. interrupt() 메소드가 호출되었다면 스레드의 interrupted()와 isInterrupted() 메소드는 true를 리턴한다. intterrupted() 메소드는 정적 메소드로 현재 스레드가 interrupted 되었는지 확인하는 것이고, isInterrupted()는 인스턴스 메소드로 현재 스레드가 interrupted 되었는지 확인할 때 사용한다. 둘 중 어떤것을 사용해도 무관하다.  
+
+```java
+boolean status = Thread.interrupted();
+boolean status = Thread.currentThread().isInterrupted();
+```
+
+> 다음은 PrintTHread2를 수정한 것으로, 일시 정지 코드인 Thread.sleep(1)을 사용하지 않고, Thread.interrupted()를 사용해서 PrintThread2의 interrupt()가 호출되었는지 확인한 다음 while문을 빠져나가도록 했다.  
+
+```java
+/* PrintThread2.java - 무한 반복해서 출력하는 스레드 */
+public class PrintThread2 extends Thread {
+    public void run() {
+        while(true) {
+            System.out.println("실행 중");
+            if(Thread.interrupted()) {  //WAIT발생 대신 interrupted() 메서드 사용
+                break;
+            }
+        }
+
+        System.out.println("자원 정리");
+        System.out.println("실행 종료");
+    }
+}
+```
+
+# 데몬 스레드
+데몬(daemon) 스레드는 주 스레드의 작업을 돕는 보조적인 역할을 수행하는 스레드이다. 주 스레드가 종료되면 데몬 스레드는 강제적으로 자동 종료되는데, 그 이유는 주 스레드의 보조 역할을 수행하므로 주 스레드가 종료되면 데몬 스레드의 존재 의미가 없어지기 때문이다. 이 점을 제외하면 데몬 스레드는 일반 스레드와 큰 차이가 없다.  
+
+스레드를 데몬으로 만들기 위해서는 주 스레드가 데몬이 될 스레드의 setDaemon(true)를 호출해주면 된다. 아래 코드를 보면 메인 스레드가 주 스레드가 되고 AutoSaveThread가 데몬 스레드가 된다.  
+
+```java
+public static void main (String[] args) {
+    AutoSaveThread = new AutoSaveThread();
+    thread.setDaemon(true);
+    thread.start();
+    ...
+}
+```
+
+주의할 점은 start() 메소드가 호출되고 나서 setDaemon(true)를 호출하면 IllegalThreadStateException이 발생하기 때문에 start() 메소드 호출 전에 setDaemon(true)를 호출해야 한다. 현재 실행중인 스레드가 데몬 스레드인지 아닌지를 구별하는 방법은 isDaemon() 메소드의 리턴값을 조사해보면 된다.  
+
+> 다음 예제는 1초 주기로 save() 메소드를 자동 호출하도록 AutoSaveThread를 작성하고, 메인 스레드가 3초 후 종료되면 AutoSaveThread도 같이 종료되도록 AutoSaveThread를 데몬 스레드로 만들었다.  
+
+```java
+/* AutoSaveThread.java - 1초 주기로 save() 메소드를 호출하는 데몬 스레드 */
+public class AutoSaveThread extends Thread {
+    public void save() {
+        System.out.println("작업 내용을 저장함");
+    }
+
+    @Override
+    public void run() {
+        while(true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                break;
+            }
+            save();
+        }
+    }
+}
+
+/* DaemonThread.java - 메인 스레드가 실행하는 코드 */
+public class DaemonExample {
+    public static void main(String[] args) {
+        AutoSaveThread autoSaveThread = new AutoSaveThread();
+        //데몬스레드로 지정하지 않는경우 스레드는 메인스레드가 종료되어도 계속 동작
+//        autoSaveThread.setDaemon(true);
+        autoSaveThread.start();
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+
+        }
+
+        System.out.println("메인 스레드 종료");
+    }
+}
+```
+
+# 스레드 그룹

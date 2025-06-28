@@ -1,4 +1,4 @@
-package sec12_multiThread.threadGroup;
+package sec12_multiThread.example.threadGroup;
 
 public class ThreadGroupExample {
     public static void main(String[] args) {

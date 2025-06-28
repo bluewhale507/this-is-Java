@@ -1,4 +1,4 @@
-package sec12_multiThread.daemonThread;
+package sec12_multiThread.example.daemonThread;
 
 public class AutoSaveThread extends Thread {
     public void save() {

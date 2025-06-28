@@ -1,4 +1,4 @@
-package sec12_multiThread.excuteSubmit;
+package sec12_multiThread.example.excuteSubmit;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

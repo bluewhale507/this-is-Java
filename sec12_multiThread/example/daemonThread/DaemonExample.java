@@ -1,4 +1,4 @@
-package sec12_multiThread.daemonThread;
+package sec12_multiThread.example.daemonThread;
 
 public class DaemonExample {
     public static void main(String[] args) {

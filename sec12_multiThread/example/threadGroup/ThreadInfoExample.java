@@ -1,6 +1,6 @@
-package sec12_multiThread.threadGroup;
+package sec12_multiThread.example.threadGroup;
 
-import sec12_multiThread.daemonThread.AutoSaveThread;
+import sec12_multiThread.example.daemonThread.AutoSaveThread;
 
 import java.util.Map;
 import java.util.Set;

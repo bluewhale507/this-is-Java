@@ -1,4 +1,4 @@
-package sec12_multiThread.blocking;
+package sec12_multiThread.example.blocking;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
