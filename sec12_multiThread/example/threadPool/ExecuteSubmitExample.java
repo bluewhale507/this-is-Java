@@ -1,10 +1,10 @@
-package sec12_multiThread.example.excuteSubmit;
+package sec12_multiThread.example.threadPool;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class ExecuteVsSubmitExample {
+public class ExecuteSubmitExample {
     public static void main(String[] args) throws Exception {
         //최대 스레드 개수가 2인 스레드풀 생성
         ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -25,8 +25,8 @@ public class ExecuteVsSubmitExample {
             };
 
             //작업큐에 작업객체 전달
-            executorService.execute(runnable);
-            //        executorService.submit(runnable);
+//            executorService.execute(runnable);
+                    executorService.submit(runnable);
 
             Thread.sleep(10);
         }

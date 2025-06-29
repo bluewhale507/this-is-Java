@@ -1029,3 +1029,280 @@ public class DaemonExample {
 ```
 
 # 스레드 그룹
+***스레드 그룹은 관련된 스레드를 묶어서 관리할 목적으로 이용***된다. ***JVM이 실행되면 system 스레드 그룹을 만들고, JVM 운영에 필요한 스레드들을 생성해서 system 스레드 그룹에 포함시킨다.*** 그리고 system의 하위 스레드 그룹으로 main을 만들고 메인 스레드를 main 스레드 그룹에 포함시킨다. ***스레드는 반드시 하나의 스레드 그룹에 포함되는데, 명시적으로 스레드 그룹에 포함시키지 않으면 기본적으로 자신을 생성한 스레드와 같은 스레드 그룹에 속하게 된다.*** 우리가 생성하는 작업 스레드는 대부분 main 스레드가 생성하므로, 기본적으로 main 스레드 그룹에 속하게 된다.  
+
+## 스레드 그룹 이름 얻기
+현재 스레드가 속한 스레드 그룹의 이름을 얻고 싶다면 다음과 같은 코드를 사용할 수 있다.  
+
+```java
+ThreadGroup group = Thread.currentThread().getThreadGroup();
+String groupName = group.getName();
+```
+
+Thread의 정적 메소드인 getAllStackTraces()를 이용하면 프로세스 내에서 실행하는 모든 스레드에 대한 정보를 얻을 수 있다.  
+
+```java
+Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+```
+
+getAllStackTraces() 메소드는 Map 타입의 객체를 리턴하는데, 키는 스레드 객체이고 값은 스레드의 상태 기록들을 갖고 있는 StackTraceElement[] 배열이다.
+
+> 다음 예쩨는 현재 실행하고 있는 스레드의 이름과 데몬 여부 그리고 속한 스레드 그룹이 무엇인지 출력한다.  
+
+```java
+/* ThreadInfoExample.java - 현재 실행중인 스레드 정보 */
+public class ThreadInfoExample {
+    public static void main(String[] args) {
+        AutoSaveThread autoSaveThread = new AutoSaveThread();
+        autoSaveThread.setName("AutoSaveThread");
+        autoSaveThread.setDaemon(true);
+        autoSaveThread.start();
+        
+        Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+        Set<Thread> threads = map.keys();
+        for(Thread thread : threads) {
+            System.out.println("Name: " + thread.getName() + ((thread.isDaemon()) ?"(데몬)" :"(주)"));
+            System.out.println("\t" + "소속그룹: " + thread.getThreadGroupt().getName());
+            System.out.println();
+        }
+    }
+}
+```
+> **실행결과**
+> 
+> <img src="img/multiThread_14.png" style="display:block; margin: 0 auto" width=100%>
+>
+> 실행 결과를 보면 가비지 컬렉션을 담당하는 Finalizer 스레드를 비롯한 일부 스레드들이 system 그룹에 속하고, main() 메소드를 실행하는 main 스레드는 system 그룹의 하위 그룹인 main에 속하는 것을 볼 수 있다. 그리고 main 스레드가 실행시킨 AutoSaveThread는 main 스레드가 소속된 main 그룹에 포함되어 있는 것을 볼 수 있다.  
+
+## 스레드 그룹 생성
+명시적으로 스레드 그룹을 만들고 싶다면 아래 생성자를 이용해 ThreadGroup 객체를 만들면 된다. ThreadGroup 이름만 주거나, 부모 ThreadGroup과 이름을 매개값으로 줄 수 있다.  
+
+```java
+ThreadGroup tg = new ThreadGroup(String name);
+ThreadGroup tg = new ThreadGroupt(ThreadGroup parent, String name);
+```
+
+스레드 그룹 생성 시 부모 스레드 그룹을 지정하지 않으면 현재 스레드가 속한 그룹의 하위 그룹으로 생성된다. 예를 들어 main 스레드가 ThreadGroup(String name)을 이용해서 새로운 스레드 그룹을 생성하면, main 스레드 그룹의 하위 스레드 그룹이 된다. 새로운 스레드 그룹을 생성한 후, 이 그룹에 스레드를 포함시키려면 Thread 객체를 생성할 때 생성자 매개값으로 스레드 그룹을 지정하면 된다. 스레드 그룹을 매개값으로 갖는 Thread 생성자는 다음 네 가지가 있다.  
+
+```java
+Thread t = new Thread(ThreadGroup group, Runnable target);
+Thread t = new Thread(ThreadGroup group, Runnalbe target, String name);
+Thread t = new Thread(ThreadGroup group, Runnable target, String name, long stackSize);
+Thread t = new Thread(ThreadGroup group, String name);
+```
+
+Runnable 타입의 target은 Runnable의 구현 객체를 말하며, String 타입의 name은 스레드의 이름이다. 그리고 long 타입의 stackSize는 JVM이 스레드에 할당할 stack 크기이다.  
+
+## 스레드 그룹의 일괄 interrupt() 
+스레드를 스레드 그룹에 포함시키면 그룹에 속한 스레드들을 일괄적으로 제어할 수 있는 장점이 있다. 이것이 가능한 이유는 ***스레드 그룹의 interrupt() 메소드는 포함된 모든 스레드의 interrupt() 메소드를 내부적으로 호출해주기 때문이다.***  
+
+**스레드 그룹의 interrupt() 메소드는 소속된 스레드의 interrupt() 메소드를 호출만할 뿐 개별 스레드에서 발생하는 InterruptedException에 대한 예외 처리를 하지 않는다.** 따라서 안전한 종료를 위해서는 개별 스레드가 예외 처리를 해야한다. 스레드 그룹에는 interrupt() 메소드 이외에도 suspent(), resume(), stop() 메소드들이 있는데, 불안전성 때문에 모두 Deprecated 되었다. 대신 interrupt() 메소드로 스레드들을 안전하게 종료하도록 유도하는 것이 좋다. 다음은 ThreadGroup이 가지고 있는 주요 메서드들이다.  
+
+| 반환타입       | 메소드                       | 설명                                                                      |
+|------------|---------------------------|-------------------------------------------------------------------------|
+| int        | activeCount()             | 현재 그룹 및 하위 그룹에서 활동중인 모든 스레드의 수를 리턴한다.                                   |
+| int        | activeGroupCount()        | 현재 그룹에서 활동중인 모든 하위 그룹의 수를 리턴한다.                                         |
+| void       | checkAccess()             | 현재 스레드가 스레드 그룹을 변경할 권한이 있는지 체크한다. 만약 권한이 없으면 SecurityException을 발생 시킨다. |
+| void       | destroy()                 | 현재 그룹 및 하위 그룹을 모두 삭제한다. 단, 그룹 내에 포함된 모든 스레드들이 종료 상태가 되어야 한다.            |
+| boolean    | isDestroyed()             | 현재 그룹이 삭제되었는지 여부를 리턴한다.                                                 |
+| int        | getMaxPriority()          | 현재 그룹에 포함된 스레드가 가질 수 있는 최대 우선순위를 리턴한다.                                  |
+| void       | setMaxPriority(int pri)   | 현재 그룹에 포함된 스레드가 가질 수 있는 최대 우선순위를 설정한다.                                  |
+| String     | getName()                 | 현재 그룹의 이름을 리턴한다.                                                        |
+| ThreadGroup | getParent()               | 현재 그룹의 부모 그룹을 리턴한다.                                                     |
+| boolean    | parentOf(ThreadGroup g)   | 현재 그룹이 매개값으로 지정한 스레드 그룹의 부모인지 여부를 리턴한다.ㅣ                                
+| boolean    | isDaemon()                | 현재 그룹이 데몬 그룹인지 여부를 리턴한다.                                                |
+| void       | setDaemon(boolean daemon) | 현재 그룹을 데몬 그룹으로 설정한다.                                                    |
+| void       | list()                    | 현재 그룹에 포함된 스레드와 하위 그룹에 대한 정보를 출력한다.                                     |
+| void       | interrupt()               | 현재 그룹에 포함된 모든 스레드들을 interrupt 한다.                                       |
+
+> 다음 예제는 스레드 그룹을 생성하고, 정보를 출력해본다. 그리고 3초 후 스레드 그룹의 interrupt() 메소드를 호출해서 스레드 그룹에 포함된 모든 스레드들을 종료시킨다.  
+
+```java
+/* WorkThread.java - InterruptedException이 발생할 때 스레드가 종료되도록 함 */
+public class WorkTHread extends Thread {
+    public WorkThread(ThreadGroup threadGroup, String threadName) {
+        super(threadGroup, threadName);
+    }
+    
+    @Overridepublic void run() {
+        shile(true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.out.println(getName() + "interrupted");
+                break;
+            }
+        }
+        System.out.println(getName() + "종료됨");
+    }
+}
+
+/* ThreadGroupExample.java - 스레드 그룹을 이용한 일괄 종료 예제 */
+public class ThreadGroupExample {
+    public static void main(String[] args) {
+        ThreadGroup threadGroup = new ThreadGroup("myGroup");
+        WorkThread workThreadA = new WorkThread(myGroup, "workThreadA");
+        WorkThread workThreadB = new WorkThread(myGroup, "workThreadB");
+        
+        workThreadA.start();
+        workThreadB.start();
+
+        System.out.println("[ main 스레드 그룹의 list() 메소드 출력 내용 ]");
+        mainGroup.list();
+        System.out.println();
+        
+        try { Thread.sleep(3000); } catch (InterruptedException e) {}
+
+        System.out.println("[ myGroup 스레드 그룹의 interrupt() 메소드 호출 ]");
+        myGroup.interrupt();
+    }
+}
+```
+
+> #### ✅ 왜 super(threadGroup, threadName)을 호출하는가?  
+> super(threadGroup, threadName)을 호출하면, 해당 스레드를 특정한 스레드 그룹에 속하도록 지정할 수 있기 때문.  
+> 
+> => 상위 클래스는 Thread이다. 즉, **Thread(ThreadGroup tr, ThreadName tn)** 을 호출하기 위함. 이 생성자는 스레드를 생성할 때 명시적으로 스레드 그룹과 이름을 지정할 수 있게 해준다.  
+
+> **실행결과**
+> 
+> <img src="img/multiThread_15.png" style="display:block; margin: 0 auto" width=100%>
+
+실행 결과를 보면 12라인의 list() 메소드는 현재 스레드 그룹의 이름과 최대 우선순위를 헤더로 출력하고, 그 아래에 현재 스레드 그룹에 포함된 스레드와 하위 스레드 그룹의 내용을 보여준다. 스레드는 [스레드이름, 우선순위, 소속 그룹명]으로 출력되는 것을 볼 수 있다. 18 라인의 interrupt() 메소드를 호출하면 myGroup에 포함된 두 스레드에서 InterruptedException이 발생되어 스레드가 종료되는 것을 알 수 있다.  
+
+# 스레드 풀
+병렬 작업 처리가 많아지면 스레드 개수가 증가되고 그에 따른 스레드 생성과 스케줄링으로 인해 CPU가 바빠져 메모리 사용량이 늘어나고, 곧 애플리케이션의 성능이 저하된다. 갑작스런 병렬 작업의 폭증으로 인한 ***스레드의 폭증을 막으려면 스레드풀(ThreadPool)을 사용해야한다.*** 스레드 풀은 ***작업 처리에 사용되는 스레드를 제한된 개수만큼 정해놓고 작업 큐(Queue)에 들어오는 작업들을 하나씩 스레드가 맡아 처리한다.*** 작업 처리가 끝난 스레드는 다시 작업 큐에서 새로운 작업을 가져와 처리한다. 그렇기 때문에 작업 처리 요청이 폭증되어도 스레드의 전체 개수가 늘어나지 않으므로 애플리케이션의 성능이 급격히 저하되지 않는다.  
+
+자바는 스레드풀을 생성하고 사용할 수 있도록 java.util.concurrent 패키지에서 ExecutorService 인터페이스와 Executors 클래스를 제공하고 있다. Executors의 다양한 정적 메소드를 이용해서 ExecutorService가 동작하는 방식을 보여준다.  
+
+<img src="img/multiThread_16.png" style="display:block; margin: 0 auto" width=100%>
+
+## 스레드풀 생성 및 종료
+### 스레드풀 생성
+ExecutorsService 구현 객체는 Executors 클래스의 다음 두 가지 메소드 중 하나를 이용해서 간편하게 생성할 수 있다.  
+
+|메소드명(매개변수)|초기 스레드 수|코어 스레드 수|최대 스레드 수|
+|---|---|---|---|
+|newCachedThreadPool()|0|0|Integer.MAX_VALUE|
+|newFixedThreadPool(int nThreads)|0|nThreads|nThreads|
+
+**초기 스레드 수는 ExecutorsService 객체가 생성될 때 기본적으로 생성되는 스레드 수**를 말하고, **코어 스레드 수는 스레드 수가 증가된 후 사용되지 않는 스레드를 스레드풀에서 제거할 때 최소한의 유지해야 할 스레드 수**를 말한다. **최대 스레드 수는 스레드풀에서 관리하는 최대 스레드 수이다.**  
+
+newCachedThreadPool() 메소드로 생성된 스레드풀의 특징은 초기 스레드 개수와 코어 스레드 개수는 0개이고, 코어 스레드 수는 nThreads이다. 스레드 개수보다 작업 개수가 많으면 새 스레드를 생성시키고 작업을 처리한다. 이론적으로는 int 값이 가질 수 있는 최대값만큼 스레드가 추가되지만, 운영체제의 성능과 상황에 따라 달라진다. ***1개 이상의 스레드가 추가되었을 경우 60초 동안 추가된 스레드가 아무 작업을 하지 않으면 추가된 스레드를 종료하고 풀에서 제거한다.*** 다음은 newCachedThreadPool()을 호출해서 ExecutorsService 구현 객체를 얻는 코드이다.  
+
+```java
+ExecutorsService executorsService = Executors.newCachedThreadPool();
+```
+
+newFixedThreadPool(int nThreads) 메소드로 생성된 스레드풀의 초기 스레드 개수는 0개이고, 코어 스레드 수는 nThreads이다. 스레드 개수보다 작업 개수가 많으면 새 스레드를 생성시키고 작업을 처리한다. 최대 스레드 개수는 매개값으로 준 nThreads이다. 이 스레드풀은 스레드가 작업을 처리하지 않고 놀고 있더라도 스레드 개수가 줄지 않는다. 다음은 CPU 코어의 수만큼 최대 스레드를 사용하는 스레드풀을 생성시킨다.  
+
+```java
+ExecutorsService executorService = Executors.newFixedThreadPool(
+        Runtime.getRuntime().availableProcessors()
+);
+```
+
+상술한 두 스레드풀 생성 메서드를 이용하지 않고 코어 스레드 개수와 최대 스레드 개수를 설정하고 싶다면 직접 ThreadPoolExecutor 객체를 생성하면 된다. 사실 위 두가지 메소드도 내부적으로 ThreadPoolExecutor 객체를 생성하면된다.  
+
+> 초기 스레드 개수가 0개, 코어 스레드 개수가 3개, 최대 스레드 개수가 100개인 스레드풀을 생성한다. 그리고 코어 스레드 3개를 제외한 나머쥐 추가된 스레드가 120초 동안 놀고있을 경우 해당 스레드를 제거해서 스레드 수를 관리한다.
+
+```java
+ExecutorService threadPool = new ThreadPOolExecutor(
+        3,                  // 코어 스레드 개수
+        100,                // 최대 스레드 개수
+        120L,               // 놀고 있는 시간
+        TimeUnit.SECONDS,                   // 놀고 있는 시간 단위
+        new SynchronousQueue<Runnable>()    // 작업 큐
+);
+```
+
+### 스레드 풀 종료
+***스레드풀의 스레드는 기본적으로 데몬 스레드가 아니기 때문에 main 스레드가 종료되더라도 작업을 처리하기 위해 계속 실행 상태로 남아 있다.*** 그래서 main() 메소드가 실행이 끝나도 애플리케이션 프로세스는 종료되지 않는다. 애플리케이션을 종료하려면 스레드풀을 종료시켜 스레드들이 종료상태가 되도록 처리해주어야 한다. ExecutorsService는 종료와 관련해서 다음 세 개의 메소드를 제공하고 있다.  
+
+| 리턴 타입          | 메소드명(매개변수)                                    | 설명                                                                                                             |
+|----------------|-----------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| void           | shutdown()                                    | 현재 처리 중인 작업뿐만 아니라 작업 큐에 대기하고 있는 모든 작업을 처리한 뒤에 스레드풀을 종료 시킨다.                                                    |
+| List<Runnable> | shutdownNow()                                 | 현재 작업 처리 중인 스레드를 interrupt해서 작업 중지를 시도하고 스레드풀을 종료시킨다. 리턴값은 작업 큐에 있는 미처리된 작업(Runnable)의 목록이다.                   |
+| boolean        | awaitTermination(long timeout, TimeUnit unit) | shutdown() 메소드 호출 이후, 모든 작업 처리를 timeout 시간 내에 완료하면 true를 리턴하고, 완료하지 못하면 작업 처리 중인 스레드를 interrupt하고 false를 리턴한다. |
+
+남아있는 작업을 마무리하고 스레드풀을 종료할 때에는 shutdown()을 일반적으로 호출하고, 남아있는 작업과는 상관없이 강제로 종료할 때에는 shutdownNow()를 호출한다.  
+
+```java
+executorService.shutdown();
+또는
+executorService.shutdownNow();
+```
+
+## 작업 생성과 처리 요청
+### 작업 생성
+하나의 작업(스레드 풀의 작업큐에 전달할 작업객체)은 Runnable 또는 Callable 구현 클래스로 표현한다. Runnable과 Callable의 차이점은 작업 처리 완료 후 리턴값이 있느냐 없느냐이다. 다음은 작업을 정의하기 위해 Runnable과 Callable 구현 클래스를 작성하는 방법을 보여준다.  
+
+| Runnable 구현 클래스                                                                      | Callable 구현 클래스                                                                                                                  |
+|--------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| Runnable task = new Runnable() {<br/>@Override public void run() {<br/>// 스레드가 처리할 작업내용<br/>}<br/>} | Callable<T> task = new Callable<T>() {<br/>@Override public T call() throws Exception {<br/>// 스레드가 처리할 작업내용<br/>return T<br/>}<br/>} |
+
+Runnable의 run() 메소드는 리턴값이 없고, Callable의 call() 메소드는 리턴값이 있다. call()의 리턴 타입은 implements Callable<T>에서 지정한 T 타입이다. 스레드풀의 스레드는 작업 큐에서 Runnable 또는 Callable 객체를 가져와 run()과 call() 메소드를 실행한다.  
+
+### 작업 처리 요청
+작업 처리 요청이란 ExecutorService의 작업 큐에 Runnable 또는 Callable 객체를 넣는 행위를 말한다. ExecutorService는 작업 처리 요청을 위해 다음 두 가지 종류의 메소드를 제공한다.  
+
+| 리턴 타입     | 메소드명(매개 변수)                     | 설명                                                               |
+|-----------|---------------------------------|------------------------------------------------------------------|
+| void      | execute(Runnable command)       | Runnable을 작업 큐에 저장 / 작업 처리 결과를 받지 못함                             |
+| Future<?> | submit(Runnalbe task)           | Runnable 또는 Callable을 작업 큐에 저장, 리턴된 Future를 통해 작업 처리 결과를 얻을 수 있음 |
+| Future<V> | submit(Runnable task, V result) | 상동                                                               |
+| Future<V> | submit(Callable<V> task)        | 상동                                                               |
+
+`execute()`와 `submit()` 메소드의 차이점은 두 가지이다. 하나는 execute()는 작업 처리 결과를 받지 못하고 submit()은 작업 처리 결과를 받을 수 있도록 Future를 리턴한다. 또 다른 차이점은 **execute()는 작업 처리 도중 예외가 발생하면 스레드가 종료되고, 해당 스레드는 스레드풀에서 제거된다. 따라서 스레드풀은 다른 작업 처리를 위해 새로운 스레드를 생성한다.** 반면에 **submit()은 작업 처리 도중 예외가 발생하더라도 스레드는 종료되지 않고 다음 작업을 위해 재사용된다.** 그렇기 때문에 ***가급적이면 스레드의 생성 오버헤더를 줄이기 위해서 submit()을 사용하는 것이 좋다.*** 
+
+> 다음 예제는 Runnable 작업을 정의할 때 Integer.parseInt("삼")을 넣어 NumberFormatException이 발생하도록 유도했다. 10개의 작업을 execute()와 submit() 메소드로 각각 처리 요청 했을 경우 스레드풀의 상태를 살펴본다.
+
+```java
+/* ExecuteExample.java - execute() 메소드로 작업 처리 요청한 경우 */
+import java.util.concurrent.ThreadPoolExecutor;
+
+public class ExecuteExample {
+    public static void main(String[] args) {
+        ExecutorService executorService = Execcutors.newFixedThreadPool(2);  //최대 스레드 개수가 2개인 스레드풀 생성
+
+        for (int i = 0; i < 10; i++) {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    // 스레드 총 개수 및 작업 스레드 이름 출력
+                    ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executorService;
+                    int poolSize = threadPoolExecutor.getPoolSize();
+                    String threadName = Thread.currentThread().getName();
+                    System.out.println("[총 스레드 개수: " + poolSize + "] 작업 스레드 이름: " + threadName);
+                    
+                    // 예외 발생 시킴
+                    int value = Integer.parseInt("삼");
+                }
+            };
+            
+            executorService.execute(runnable);
+            //executorService.submit(runnable);
+            
+            Thread.sleep(10); // 콘솔에 출력 시간을 주기 위해 0.01초 일시 정지시킴
+        }
+        
+        executorService.shutdown();
+    }
+}
+```
+
+> **execute() 실행 결과**
+> 
+> <img src="img/multiThread_17.png" style="display:block; margin: 0 auto" width=100%> 
+>
+> 스레드풀의 스레드 최대 개수 2는 변함이 없지만, 실행 스레드의 이름을 보면 모두 다른 스레드가 작업을 처리하고 있다. 이것은 작업 처리 도중 예외가 발생했기 때문에 해당 스레드는 제거되고 새 스레드가 계속 생성되었기 때문이다.  
+
+> **submit() 실행 결과**
+>
+> <img src="img/multiThread_18.png" style="display:block; margin: 0 auto" width=100%> 
+>
+> 예외가 발생하더라도 스레드가 종료되지 않고 계속 재사용되어 다른 작업을 처리하고 있는 것을 볼 수 있다.  
+
+### 블로킹 방식의 작업 완료 통보
+ExecutorService의 submit() 메소드는 매개값으로 준 Runnable 또는 Callable 작업을 스레드풀의 작업 큐에 저장하고 즉시 Future 객체를 리턴한다. 
+
