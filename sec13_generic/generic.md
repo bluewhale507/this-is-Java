@@ -74,6 +74,43 @@ public class Box<String> {
 - 제네릭으로 선언된 타입인데 일반타입처럼 사용하는 경우 제네릭의 raw 타입을 사용한다.  
 => 타입 매개변수를 Object로 간주하고 처리한다.
 
+>✅ 1. 제네릭 - 타입 매개변수를 static 필드의 타입으로 사용할 수 없다.  
+>🔸 핵심 이유: 타입 매개변수는 인스턴스 수준에서만 유효하기 때문입니다.
+> 🔍 예시 (컴파일 오류)
+>```java
+>public class Box<T> {
+>   private static T value;  // ❌ 컴파일 오류
+>}
+>```
+>**📌 왜 안 되는가?**  
+>T는 클래스가 인스턴스화될 때 구체화됩니다. 그러나 static 필드는 클래스 수준의 변수입니다.  
+>인스턴스를 만들지 않아도 접근할 수 있어야 합니다. 즉, static은 클래스 전체에 공통이고, T는 각 인스턴스마다 다를 수 있음.  
+> 따라서 static 영역에서는 T가 무슨 타입인지 알 수 없습니다.
+
+> ✅ 2. 제네릭 타입의 배열을 선언할 수 없다  
+> 🔍 예시 (컴파일 오류)
+> ```java
+> public class MyList<T> {
+>   private T[] data = new T[10]; // ❌ 컴파일 오류
+> }
+> ```
+>🔸 이유: Java의 제네릭은 런타임 시 타입 정보를 유지하지 않기 때문입니다. (→ 타입 소거)  
+>
+> **📌 자세한 설명**  
+> Java에서는 제네릭은 컴파일 타임에만 타입을 검사하고, 실제로 생성된 바이트코드에는 타입 매개변수 정보가 존재하지 않습니다.  
+> 즉, new T[10]처럼 제네릭 타입의 배열을 만들면, 런타임에 어떤 타입인지 모르기 때문에 배열을 안전하게 생성할 수 없습니다.
+> 
+> 다만, T[]와 같이 제네릭 타입 배열의 변수 선언만 하는 것은 가능합니다. 예를 들어, 다음과 같이 외부에서 배열을 받아 저장하거나, 생성은 리플렉션이나 Object[]를 활용하여 우회할 수 있습니다:
+> ```java
+> public class MyList<T> {
+>   private T[] data; // ✅ 배열 변수 선언은 가능
+>   public void setData(T[] input) { 
+>       this.data = input; // 외부에서 받은 배열 저장 가능
+>   }
+> }
+>```
+
+
 ## 멀티 타입 파라미터
 제네릭 타입은 두 개이상의 멀티 타입 파라미터를 사용할 수 있는데, 이 경우 각 타입 파라미터를 콤마로 구분한다. 아래 예제는 제네릭 타입을 정의하고 객체 생성 및 Getter Setter 호출을 보여준다.
 
@@ -88,12 +125,38 @@ public class Box<String> {
 > public \<T> Box boxing(T t) { ... }
 
 제네릭 메소드는 타입 파라미터의 구체적인 타입을 명시적으로 지정해도 되고, 컴파일러가 매개값의 타입을 보고 구체적인 타입을 추정하도록 할 수도 있다.  
-> Box\<Integer> box = \<Integer>boxing(100);      // 타입 파라미터를 명시적으로 Integer으로 지정  
-> Box\<Integer> box = boxing(100);               // 타입 파라미터를 Integer로 추정
+
+```java
+public static <T> Box<T> boxing(T t) {
+        Box<T> box = new Box<>();
+        box.set(t);
+        return box;
+    }
+```
+
+- \<T>는 메서드 자체에 선언된 타입 파라미터이다.  
+- Box<T> boxing(T t)의 T는 매개변수 타입이기도 하고 반환 타입의 일부이기도 하다.  
+- 호출 시 T를 직접 명시하거나, 컴파일러가 추론하게 할 수 있다.  
+
+**✅ 1. 타입 파라미터 명시적 지정**
+```java
+Box<Integer> box = <Integer>boxing(100);
+```
+- 여기서 \<Integer>는 boxing() 메서드에 직접 타입을 명시적으로 지정한 것이다.  
+- 마치 boxing() 앞에 \<Integer>를 붙여서 T = Integer라고 선언하는 셈.  
+- 자바 컴파일러는 이것을 보고 Box\<Integer> boxing(Integer t) 처럼 인식한다.
+
+**✅ 2. 타입 파라미터 추론 (type inference)**
+```java
+Box<Integer> box = boxing(100);
+```
+- 이 경우 100이라는 리터럴을 보고 컴파일러가 T를 Integer로 자동 추론한다.  
+- 즉, boxing(100)을 호출하는 시점에 컴파일러가 T = Integer라고 판단한다.  
+- 결과적으로 위와 똑같은 Box<Integer>가 반환되므로, 타입 명시 없이도 쓸 수 있다.
 
 참고 : [Util.java](./example/genericMethod/Util.java), [BoxingMethodExample.java](./example/genericMethod/BoxingMethodExample.java), 
 
-다음 예제는 Util 클래스에 정적 제네릭 메소드로 compare()를 정의하고, 두 개의 Pair를 매개값으로 받아 K와 V값이 동일한지 검사하고 boolean 값을 리턴한다.
+> 다음 예제는 Util 클래스에 정적 제네릭 메소드로 compare()를 정의하고, 두 개의 Pair를 매개값으로 받아 K와 V값이 동일한지 검사하고 boolean 값을 리턴한다.
 
 참고 : [Util.java](./example/genericMethod/Util.java), [CompareMethodExample.java](./example/genericMethod/CompareMethodExample.java)
 
@@ -135,7 +198,10 @@ public <T extends Number> int compar(T t1, T t2) {
 참고 : [WildCardExample.java](./example/wildcardsType/WildCardExample.java), [Course.java](./example/wildcardsType/Course.java)
 
 ## 제네릭 타입의 상속과 구현
-제네릭 타입도 다른 타입과 마찬가지로 부모 클래스가 될 수 있다. 그러나 클래스의 상속과 같이 제네릭 타입 간 명시적인 상속이 정의되어 있지 않으면 서로 형변환이 불가능하다. 다음은 Product<K, V> 제네릭 타입을 상속해서 ChildProduct<T, M> 타입을 정의한다. 자식 제네릭은 추가적으로 타입 파라미터를 가질 수 있다.  
+제네릭 타입도 다른 타입과 마찬가지로 부모 클래스가 될 수 있다. 다음은 Product<T,M> 제네릭 타입을 상속해서 ChildProduct<T,M> 타입을 정의한다.   
+> public class ChildProduct<T, M> extends Product<T, M> { ... }
+
+자식 제네릭 타입은 추가적으로 타입 파라미터를 가질 수 있다. 다음은 세 가지 타입 파라미터를 가진 자식 제네릭 타입을 선언한 것이다.  
 > public class ChildProduct<T, M, C> extends Product<T, M> { ... }
 
 ```java
@@ -161,6 +227,47 @@ public class ChildProduct<T, M, C> extends Product<T, M> {
 }
 ```
 
-제네릭 인터페이스를 구현한 클래스도 제네릭 타입이 된다.
+제네릭 인터페이스를 구현한 클래스도 제네릭 타입이 되는데, 다음과 같이 제네릭 인터페이스가 있다고 가정해보자.
+
+```java
+public class StorageImpl<T> implements Storage<T> {
+    private T[] array;
+    
+    public StorageImpl(int capacity) {
+        this.array = (T[]) (new Object[capacity]);
+    }
+    
+    @Override
+    public void add(T item, int idex) {
+        array[index] = item;
+    }
+    
+    @Override
+    public T get(int index) {
+        return array[index];
+    }
+}
+```
+
+> 타입 파라미터로 배열을 생성하려면 new T[n] 형태로 생성할 수 없고, (T[]) (new Object[n])으로 생성해야 한다.  
+
+
+> 다음은 ChildProductAndStorageExample은 ChildeProduct<T, M, C>와 StorageImpl<T> 클래스의 사용 방법을 보여준다.  
+
+```java
+/* ChildProductAndStorageExample.java - 제네릭 타입 사용 클래스 */
+public class ChildProductAndStorageExample {
+    public static void main(String[] args) {   
+        ChildProduct<Tv, String, String> product = new ChildeProduct<>();
+        product.setKind(new Tv());
+        product.setModel("smartTv");
+        product.setCompany("Samsung");
+        
+        Storage<Tv> storage = new StorageImpl<Tv>(100);
+        storage.add(new Tv(), 0);
+        Tv tv = storage.get(0);
+    }
+}
+```
 
 ## [연습문제 풀이](./ChapterTest.md)
