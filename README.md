@@ -12,10 +12,10 @@ sec 08 : [interface](https://github.com/bluewhale507/this-is-Java/blob/main/sec0
 sec 09 : [nestedClass](https://github.com/bluewhale507/this-is-Java/blob/main/sec09_nested_ClassAndInterface/nestedClass.md)  
 sec 10 : [exception](https://github.com/bluewhale507/this-is-Java/blob/main/sec10_exception/exception.md)  
 sec 11 : [JavaAPI](https://github.com/bluewhale507/this-is-Java/blob/main/sec11_basicAPI/basicAPI.md)   
-sec 12 : [multiThread](./)  
+sec 12 : [multiThread](https://github.com/bluewhale507/this-is-Java/blob/main/sec12_multiThread/multiThread.md)  
 sec 13 : [generic](https://github.com/bluewhale507/this-is-Java/blob/main/sec13_generic/generic.md)  
 sec 14 : [lambdaExpressions](https://github.com/bluewhale507/this-is-Java/blob/main/sec14_lambdaExpressions/lambdaExpressions.md)  
 sec 15 : [JavaCollectionFramework](https://github.com/bluewhale507/this-is-Java/blob/main/sec15_JCF/JCF.md)  
-sec 16 :  
-sec 17 :   
-sec 18 : [IOAndNetworking](https://github.com/bluewhale507/this-is-Java/blob/main/sec18_IOAndNetworking/IOAndNetworking.md)  
+sec 16 : [streamIterator](https://github.com/bluewhale507/this-is-Java/blob/main/sec16_streamIterator/streamIterator.md)  
+sec 17 : JavaFX  
+sec 18 : [IOAndNetworking](https://github.com/bluewhale507/this-is-Java/blob/main/sec18_IOAndNetworking/IOAndNetworking.md)   
