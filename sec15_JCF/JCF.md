@@ -24,8 +24,8 @@ java.util
 │   ├── List<E>                 ← 순서 O, 중복 O
 │   │   ├── ArrayList
 │   │   ├── LinkedList
-│   │   └── Vector
-│   │       └── Stack
+│   │   └── Vector              ← legacy
+│   │       └── Stack           ← legacy
 │   ├── Set<E>                  ← 순서 X, 중복 X
 │   │   ├── HashSet
 │   │   │   └── LinkedHashSet
@@ -41,14 +41,15 @@ java.util
 ├── Map<K, V>                   ← Collection 아님!
 │   ├── HashMap
 │   │   └── LinkedHashMap
+│   ├── Hashtable               ← legacy, synchronized
+│   │   └── Properties          ← 설정 전용 (String, String)
 │   └── SortedMap<K, V>
 │       └── NavigableMap<K, V>
 │           └── TreeMap
 │
 └── 기타 유틸리티
-├── Collections             ← 컬렉션 관련 static 유틸
-└── Arrays                  ← 배열 유틸
-아래는 ArrayList, Vector, LinkedList에서 공통으로 사용가능한 List 인터페이
+    ├── Collections             ← 컬렉션 관련 static 유틸
+    └── Arrays                  ← 배열 유틸
 ```
 
 아래는 ArrayList, Vector, LinkedList에서 공통으로 사용가능한 List 인터페이스의 메소드들이다. 인덱스로 객체를 관리하기 때문에 인덱스를 매개값으로 갖는 메소드가 많다.
