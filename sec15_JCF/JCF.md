@@ -48,6 +48,7 @@ java.util
 └── 기타 유틸리티
 ├── Collections             ← 컬렉션 관련 static 유틸
 └── Arrays                  ← 배열 유틸
+아래는 ArrayList, Vector, LinkedList에서 공통으로 사용가능한 List 인터페이
 ```
 
 아래는 ArrayList, Vector, LinkedList에서 공통으로 사용가능한 List 인터페이스의 메소드들이다. 인덱스로 객체를 관리하기 때문에 인덱스를 매개값으로 갖는 메소드가 많다.
