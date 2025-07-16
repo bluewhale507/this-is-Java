@@ -17,6 +17,39 @@ List 컬렉션은 객체를 일렬로 늘어놓은 구조를 가지고 있다. �
 
 <img src=./img/JCF_02.png style="display: block; margin: 0 auto;">
 
+***클래스 계층도***
+```text
+java.util
+├── Collection<E>               ← 최상위 인터페이스
+│   ├── List<E>                 ← 순서 O, 중복 O
+│   │   ├── ArrayList
+│   │   ├── LinkedList
+│   │   └── Vector
+│   │       └── Stack
+│   ├── Set<E>                  ← 순서 X, 중복 X
+│   │   ├── HashSet
+│   │   │   └── LinkedHashSet
+│   │   └── SortedSet<E>
+│   │       └── NavigableSet<E>
+│   │           └── TreeSet
+│   └── Queue<E>                ← FIFO 구조
+│       ├── Deque<E>            ← 양방향 큐
+│       │   ├── ArrayDeque
+│       │   └── LinkedList
+│       └── PriorityQueue       ← 우선순위 큐 (Heap 기반)
+│
+├── Map<K, V>                   ← Collection 아님!
+│   ├── HashMap
+│   │   └── LinkedHashMap
+│   └── SortedMap<K, V>
+│       └── NavigableMap<K, V>
+│           └── TreeMap
+│
+└── 기타 유틸리티
+├── Collections             ← 컬렉션 관련 static 유틸
+└── Arrays                  ← 배열 유틸
+```
+
 아래는 ArrayList, Vector, LinkedList에서 공통으로 사용가능한 List 인터페이스의 메소드들이다. 인덱스로 객체를 관리하기 때문에 인덱스를 매개값으로 갖는 메소드가 많다.
 
 | 기능     | 메소드         | 설명                               |
@@ -290,3 +323,570 @@ String value = properties.getProperty("key");
 참고 : [PropertiesExample.java](./example/mapCollection/PropertiesExample.java)
 
 # 검색 기능을 강화시킨 컬렉션
+컬렉션 프레임 워크는 검색 기능을 강화시킨 Tree와 TreeMap을 제공하고 있다. 이릉메서 알 수 있듯이 TreeSet은 Set컬렉션이고, TreeMap은 Map컬렉션이다. 이 컬렉션들은 이진 트리를 사용해서 계층적 구조를 가지면서 객체를 저장한다.  
+
+## 이진 트리 구조
+첫 번째로 저장되는 값은 루트 노드가 되고, 두 번째 루트값은 노드부터 시작해서 값의 크기를 비교하면서 트리를 따라 내려간다. 작은 값은 왼쪽, 큰 값은 오른쪽에 저장한다. 숫자가 아닌 문자를 저장할 경우 문자의 유니코드 값으로 비교한다. 트리 구성이 끝나면 왼쪽 마지막 노드에서부터 오른쪽 마지막 노드까지 순서대로 값을 읽으면 오름차순으로 정렬된 값을 얻을 수 있다.     
+
+## TreeSet  
+TreeSet은 이진 트리(binarySearchTree가 더 정확함)를 기반으로 한 Set 컬렉션이다. 하나의 노드는 노드값인 value와 왼쪽과 오른쪽 자식 노드를 참조하기 위한 두 개의 변수로 구성된다. TreeSet에 객체를 저장하면 자동으로 정렬되는데, 부모값과 비교해서 낮은것은 왼쪽, 높은 것은 오른쪽 자식 필드에 저장된다.  
+
+TreeSet을 생성하기 위해서는 저장할 객체 타입을 파라미터로 표기하고 기본 생성자를 호출하면 된다.  
+
+```java
+TreeSet<E> treeSet = new TreeSet<E>();
+```
+
+Set 인터페이스 타입 변수에 대입해도 되지만 TreeSet 클래스 타입으로 대입한 이유는 객체를 차거나 범위 검색과 관련된 메소드를 사용하기 위해서이다. 다음은 TreeSet이 가지고 있는 검색 관련 메소드들이다. lower(), higher(), floor(), ceiling(), descindingXxx()는 Navigable<E> 인터페이스가 제공하는 메서드로, TreeSet은 NavigableSet을 구현한 클래스이므로 이 연산들을 사용가능하다. 이 인터페이스는 정렬된 컬렉션에서 특정 요소 기준으로 앞/뒤의 요소를 찾는 기능을 갖는다.
+
+|리턴 타입|메소드|설명|
+|---|---|---|
+|E|first()|제일 낮은 객체를 리턴|
+|E| last()|제일 높은 객체를 리턴|
+|E|lower(E e)|주어진 객체보다 바로 아래 객체를 리턴|
+|E|higher(E e)|주어진 객체보다 바로 위 객체를 리턴|
+|E|floor(E e)|주어진 객체와 동등한 객체가 있으면 리턴, 만약 없다면 주어진 객체의 바로 아래의 객체를 리턴|
+|E|ceiling(E e)|주어진 객체와 동등한 객체가 있으면 리턴, 만약 없다면 주어진 객체의 바로 위의 객체를 리턴|
+|E|pollFirst()|제일 낮은 객체를 꺼내오고 컬렉션에서 제거함|
+|E|pollLast()|제일 높은 객체를 꺼내오고 컬렉션에서 제거함|
+
+> 다음 예제는 점수를 무작위로 저장하고 특정 점수를 찾는 방법을 보여준다.
+
+```java
+/* TreeSetExample.java - 특정 객체 찾기 */
+public class TreeSetExample {
+    public static void main(String[] args) {
+        TreeSet<Integer> scores = new TreeSet<Integer>();
+        scores.add(87);
+        scores.add(98);
+        scores.add(75);
+        scores.add(95);
+        scores.add(Integer.valueOf(80));
+
+        Integer score = null;
+
+        score = scores.first();
+        System.out.println("가장 낮은 점수: " + score);
+
+        score = scores.last();
+        System.out.println("가장 높은 점수: " + score + "\n");
+
+        score = scores.higher(95);
+        System.out.println("95위의 점수: " + score + "\n");
+
+        score = scores.floor(95);
+        System.out.println("95점이거나 바로 아래 점수: " + score + "\n");
+
+        score = scores.ceiling(85);
+        System.out.println("85점 이거나 바로 위의 점수: " + score + "\n");
+
+        while(!scores.isEmpty()) {
+            score = scores.pollFirst();
+            System.out.println(score + "(남은 객체 수: " + scores.size() + ")");
+        }
+    }
+}
+```
+
+다음은 TressSEt이 가지고 있는 정렬과 관련된 메소드들이다.
+
+|리턴 타입|메소드|설명|
+|---|---|---|
+|Iterator<E>|descendingIterator()|내림차순으로 정렬된 Iterator를 리턴|
+|NavigableSet<E>|descendingSet()|내림차순으로 정렬된 NavigableSet을 반환| 
+
+`descendingIterator()` 메소드는 내림차순으로 정렬된 Iterator 객체를 리턴하는데, Iterator는 이미 Set 컬렉션에서 사용 방법을 살펴보았다. `descendingSet()` 메소드는 내림차순으로 정렬된 NavgableSet 객체를 리턴하는데 NavigableSet은 TreeSet과 마찬가지로 first(), last(), lower(), higher(), floor(), ceiling() 메소드를 제공하고, 정렬 순서를 바꾸는 descendingSet() 메소드도 제공한다.  오름차순으로 정렬하고 싶다면 다음과 같이 descendingSet() 메소드를 두 번 호출하면 된다.  
+
+```java
+NavigableSet<E> descendingSet = treeSet.descendingSet();
+NavigableSet<E> ascendingSet = descendingSet.descendingSet();
+```
+
+```java
+/* TreeSetExample2.java - 객체 정렬하기 */
+public class TreeSetExampl2 {
+    public static void main(String[] args) {
+        TreeSet<Integer> scores = new TreeSet<Integer>();
+        scores.add(87);
+        scores.add(98);
+        scores.add(75);
+        scores.add(95);
+        scores.add(Integer.valueOf(80));
+
+        NavigableSet<Integer> descendingSet = scores.descendingSet();
+        for(Integer score : descendingSet) {
+            System.out.print(score + " ");
+        }
+        System.out.println();
+
+        NavigableSet<Integer> ascendingSet = descendingSet.descendingSet();
+
+        for(Integer score : ascendingSet) {
+            System.out.print(score + " ");
+        }
+    }
+}
+```
+
+> 다음은 TreeSet이 가지고 있는 범위 검색과 관련된 메소드들이다.
+
+|리턴 타입|메소드| 설명                                                                                       |
+|---|---|------------------------------------------------------------------------------------------|
+|NavigableSet<E>|headSet(E toElement, boolean inclusive)| 주어진 객체보다 낮은 객체들을 NavigableSet으로 리턴.<br/>주어진 객체 포함 여부는 두 번째 매개값에 따라 달라짐.                  |
+|NavigableSet<E>|tailSet(E fromElement, boolean inclusive)| 주어진 객체보다 높은 객체들을 NavigableSet으로 리턴.<br/>주어진 객체 포함 여부는 두 번째 매개값에 따라 달라짐.                  |
+|NavigableSet<E>|subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive)| 시작과 끝으로 주어진 객체 사이의 객체들을 NavigableSet으로 리턴. <br/>시작과 끝 객체의 포함 여부는 두 번째, 네 번째 매개값에 따라 달라짐. |
+
+> 다음은 영어 단어를 무작위로 TreeSet에 저장한 후 알파벳 c~f 사이의 단어를 검색해보는 예제이다.  
+
+```java
+/* TreeSetExample3.java - 영어 단어를 정렬하고, 범위 검색해보기 */
+public class TreeSetExample3 {
+    public static void main(String[] args) {
+        TreeSet<String> treeSet = new TreeSet<>();
+        treeSet.add("apple");
+        treeSet.add("forever");
+        treeSet.add("description");
+        treeSet.add("ever");
+        treeSet.add("zoo");
+        treeSet.add("base");
+        treeSet.add("guess");
+        treeSet.add("cherry");
+
+        System.out.println("[c~f 사이의 단어 검색]");
+        NavigableSet<String> rangeSet = treeSet.subSet("c", true, "f", true);
+        for(String word : rangeSet) {
+            System.out.println(word);
+        }
+    }
+}
+```
+
+## TreeMap
+TreeMap은 이진 트리를 기반으로 한 Map 컬렉션이다. TreeSet과의 차이점은 키와 값이 저장된 Map.Entry를 저장한다는 점이다. TreeMap에 객체를 저장하면 자동으로 정렬되는데, 기본적으로 부모 키값과 비교해서 키 값이 낮은것은 왼쪽 자식 노드에, 키 값이 높은것은 오른쪽 자식 노드에 Map.Entry 객체를 저장한다.(이진 탐색 트리)
+
+TreeMap을 생성후, Map 인터페이스 타입 변수에 대입해도 되지만, TreeMap 클래스 타입으로 대입한 이유는 특정 객체를 찾거나 범위 검색과 관련된 메소드를 사용하기 위함이다.  
+                                                                                                                                                                                                                                                                                                                       
+|리턴 타입| 메소드                         | 설명                                                                     |
+|---|-----------------------------|------------------------------------------------------------------------|
+|Map.Entry<K,V>| firstEntry()                | 제일 낮은 Map.Entry를 리턴                                                    |
+|Map.Entry<K,V>| lastEntry()                 | 제일 높은 Map.Entry를 리턴                                                    |
+|Map.Entry<K,V>| lowerEntry(K key)           | 주어진 키보다 바로 아래 Map.Entry를 리턴.                                           |
+|Map.Entry<K,V>}higherEntry(K key)| 주어진 키보다 바로 위 Map.Entry를 리턴. |
+|Map.Entry<K,V>| floorEntry(K key)           | 주어진 키와 동등한 키가 있으면 해당 Map.Entry를 리턴.<br/>없다면 주어진 키 바로 아래의 Map.Entry를 리턴 |
+|Map.Entry<K,V>| ceilingEntry(K key)         | 주어진 키와 동등한 키가 있으면 해당 Map.Entry를 리턴.<br/>없다면 주어진 키 바로 위의 Map.Entry를 리턴  |
+|Map.Entry<K,V>| pollFirstEntry()            | 제일 낮은 Map.Entry를 꺼내오고 컬렉션에서 제거함                                        |
+|Map.Entry<K,V>| pollLastEntry()             | 제일 높은 Map.Entry를 꺼내오고 컬렉션에서 제거함                                        |
+
+> 다음 예제는 점수를 키로, 이름을 값으로 해서 무작위로 저장하고 특정 Map.Entry를 찾는 방법을 보여준다.  
+
+```java
+/* TreeMapExample1.java - 특정 Map.Entry 찾기 */
+public class TreeMapExample1 {
+	public static void main(String[] args) {
+		TreeMap<Integer,String> scores = new TreeMap<Integer,String>();
+		scores.put(new Integer(87), "홍길동");
+		scores.put(new Integer(98), "이동수");
+		scores.put(new Integer(75), "박길순");
+		scores.put(new Integer(95), "신용권");
+		scores.put(new Integer(80), "김자바");
+		
+		Map.Entry<Integer, String> entry = null;
+		
+		entry = scores.firstEntry();
+		System.out.println("가장 낮은 점수: " + entry.getKey() + "-" + entry.getValue());
+		
+		entry = scores.lastEntry();
+		System.out.println("가장 높은 점수: " + entry.getKey() + "-" + entry.getValue() + "\n");
+		
+		entry = scores.lowerEntry(new Integer(95));
+		System.out.println("95점 아래 점수: " + entry.getKey() + "-" + entry.getValue());
+		
+		entry = scores.higherEntry(new Integer(95));
+		System.out.println("95점 위의 점수: " + entry.getKey() + "-" + entry.getValue() + "\n");
+		
+		entry = scores.floorEntry(new Integer(95));
+		System.out.println("95점 이거나 바로 아래 점수: " + entry.getKey() + "-" + entry.getValue());
+		
+		entry = scores.ceilingEntry(new Integer(85));
+		System.out.println("85점 이거나 바로 위의 점수: " + entry.getKey() + "-" + entry.getValue() + "\n");
+		
+		while(!scores.isEmpty()) {
+			entry = scores.pollFirstEntry();
+			System.out.println(entry.getKey() + "-" + entry.getValue() + "(남은 객체 수: " + scores.size() + ")");
+		}
+	}
+}
+
+```
+
+다음은 TreeMap이 가지고 있는 정렬과 관련된 메소드이다.  
+
+|리턴 타입|메소드|설명|
+|---|---|---|
+|NavigableSet<K>|descendingKeySet()|내림차순으로 정렬된 키의 NavigableSet을 리턴|
+|NaviGableMap<K,V>|descendingMap()|내림차순으로 정렬된 Map.Entry의 NavigableMap을 리턴|
+
+descendingKeySet() 메소드는 내림차순으로 정렬된 키의 NavigableSet 객체를 리턴한다. descendingMap() 메소드는 내림차순으로 정렬된 NavigableMap 객체를 리턴하는데 firstEntry(), lastEntry(), lowerEntry(), higherEntry(), floorEntry(), ceilingEntry() 메소드를 제공하고, 또한 오름차순과 내림차순을 번갈아가며 정렬 순서를 바꾸는 descendingMap() 메소드도 제공한다. 오름차순으로 정렬하고 싶다면 다음과 같이 descendingMap() 메소드를 두 번 호출하면 된다.  
+
+```java
+NavigableMap<K,V> descendingMap = treeMap.descendingMap();
+NavigableMap<K,V> ascendingMap = descendingMap.descendingMap();
+```
+
+```java
+/* TreeExample2.java - 객체 정렬하기 */
+public class TreeMapExample2 {
+    public static void main(String[] args) {
+        TreeMap<Integer, String> scores = new TreeMap<Integer, String>();
+        scores.put(new Integer(87), "홍길동");
+        scores.put(new Integer(98), "이동수");
+        scores.put(new Integer(75), "박길순");
+        scores.put(new Integer(95), "신용권");
+        scores.put(new Integer(80), "김자바");
+
+        NavigableMap<Integer,String> descendingMap = scores.descendingMap();
+
+        // Map>SotredMap>Navigable>TreeSet 순의 계층을 가지므로, SotredMap의 entrySet()을 사용가능하다.
+        Set<Map.Entry<Integer,String>> descendingEntrySet = descendingMap.entrySet();
+        for(Map.Entry<Integer,String> entry : descendingEntrySet) {
+            System.out.println(entry.getKey() + "-" + entry.getValue() + " ");
+        }
+        System.out.println();
+
+        NavigableMap<Integer,String> ascendingMap = descendingMap.descendingMap();
+        Set<Map.Entry<Integer,String>> ascendingEntrySet = ascendingMap.entrySet();
+        for(Map.Entry<Integer,String> entry : ascendingEntrySet) {
+            System.out.println(entry.getKey() + "-" + entry.getValue() + " ");
+        }
+    }
+}
+```
+
+다음은 TreeMap이 가지고 있는 범위 검색과 관련된 메소드이다.  
+
+|리턴 타입| 메소드                                                                        | 설명                                                                                                    |
+|---|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+|NavigableMap<K,V>| headMap(K toKey, boolean Inclusive)                                        | 주어진 키보다 낮은 Map.Entry들을 NavigableMap으로 리턴.<br/>주어진 키의 Map.Entry 포함 여부는 두 번째 매개값에 따라 달라짐                |
+|NavigableMap<K,V>| tailMap(K fromKey, boolean Inclusive)                                      | 주어진 키보다 높은 Map.Entry들을 NavigableMap으로 리턴.<br/>주어진 키의 Map.Entry 포함 여부는 두 번째 매개값에 따라 달라짐                |
+|NavigableMap<K,V>| subMap(K fromElement, boolean fromInclusive, K toKey, boolean toInclusive) | 시작과 끝으로 주어진 객체 사이의 Map.Entry들을 NavigableMap으로 리턴. <br/>시작과 끝 Map.Entry 포함 여부는 두 번째, 네 번째 매개값에 따라 달라짐. |
+
+> 다음은 영어 단어와 페이지 정보를 무작위로 TreeMap에 저장한 후 알파벳 c~f 사이의 단어를 검색해보는 예제이다.  
+
+```java
+/* TreeMapExample3.java - 키로 정렬하고 범위 검색하기 */
+public class TreeMapExample3 {
+    public static void main(String[] args) {
+        TreeMap<String, Integer> treeMap = new TreeMap<String, Integer>();
+        treeMap.put("apple", new Integer(10));
+        treeMap.put("forever", new Integer(60));
+        treeMap.put("description", new Integer(40));
+        treeMap.put("ever", new Integer(50));
+        treeMap.put("zoo", new Integer(10));
+        treeMap.put("base", new Integer(20));
+        treeMap.put("guess", new Integer(70));
+        treeMap.put("cherry", new Integer(30));
+
+        System.out.println("[c~f 사이의 단어 검색]");
+        NavigableMap<String,Integer> rangeMap = treeMap.subMap("c", true, "f", true);
+        for(Map.Entry<String, Integer> entry : rangeMap.entrySet()) {
+            System.out.println(entry.getKey() + "-" + entry.getValue() + "페이지");
+        }
+    }
+}
+```
+
+## Comparable과 Comparator
+TreeSet의 객체와 TreeMap의 키는 저장과 동시에 오름차순으로 정렬되는데, 숫자(Integer, Double) 타입일 경우에는 값으로 정렬하고, 문자열(String) 타입일 경우에는 유니코드로 정렬한다. TreeSet과 TreeMap은 정렬을 위해 java.lang.Comparable을 구현할 객체를 요구하는데, Integer, Double, String은 모두 Comparable 인터페이스를 구현하고 있다. 사용자 정의 클래스도 Comparable을 구현한다면 자동 정렬이 가능하다. Comparable에는 ComparaTo()라는 메소드가 정의되어 있기 때문에 사용자 정의 클래스에서는 이 메소드를 오버라이딩하여 다음과 같이 리턴값을 만들어 내야 한다.  
+
+|리턴 타입|메소드| 설명                                                               |
+|---|---|------------------------------------------------------------------|
+|int|compareTo(T o)| 주어진 객체와 같으면 0을 리턴<br/>주어진 객체보다 적으면 음수를 리턴<br/>주어진 객체보다 크면 양수를 리턴 |
+
+> 다음은 나이를 기준으로 Person 객체를 ***오름차순***으로 정렬하기 위해 Comparable 인터페이스를 구현한 것이다. 나이가 적을 경우는 -1을, 동일한 경우는 0을, 클 경우는 1을 리턴하도록 compareTo() 메소드를 재정의 하였다.  
+
+```java
+/* Person.java - Comparable 구현 클래스 */
+public class Person implements Comparable<Person>{
+    public String name;
+    public int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public int compareTo(Person o) {
+        if(age<o.age) return -1;
+        else if(age == o.age) return 0;
+        else return 1;
+    }
+}
+
+/* ComparableExample.java - 사용자 정의 겍체를 나이 순으로 정렬하기 */
+public class ComparableExample {
+    public static void main(String[] args) {
+        TreeSet<Person> treeSet = new TreeSet<Person>();
+
+        treeSet.add(new Person("홍길동", 45));
+        treeSet.add(new Person("김자바", 25));
+        treeSet.add(new Person("박지원", 31));
+
+        Iterator<Person> iterator = treeSet.iterator();
+        while(iterator.hasNext()) {
+            Person person = iterator.next();
+            System.out.println(person.name + ":" + person.age);
+        }
+    }
+}
+```
+
+TreeSet의 객체와 TreeMap의 키가 Comparable을 구현하고 있지 않은 경우에는 저장하는 순간 ClassCastException이 발생한다. Comparable 비구현 객체를 정렬하려면 TreeSet 또는 TreeMap 생성자의 매개값으로 정렬자(Comparator)를 제공하면된다.  
+```java
+// 오름차순 정렬자
+TreeSet<E> treeSet = new TreeSet<E>(new AscendingComparator());
+// 내림차순 정렬자
+TreeSet<E> treeSet = new TreeSet<E>(new DescendingComparator());
+```
+
+정렬자는 Comparator 인터페이스를 구현한 객체를 말하는데, COmparator 인터페이스에는 다음고 같이 메소드가 정의되어 있다.  
+
+|리턴 타입|메소드| 설명                                                                             |
+|---|---|--------------------------------------------------------------------------------|
+|int|compare(T o1, T o2)| o1과 o2가 동등하다면 0을 리턴<br/>o1이 o2보다 앞에 오게 하려면 음수를 리턴<br/>o1이 o2보다 뒤에 오게 하려면 양수를 리턴|
+
+> 다음은 가격을 기준으로 Fruit 객체를 내림차순으로 정렬시키는 정렬자이다.  
+
+```java
+/* DescendingComparator.java - Fruite의 내림차순 정렬자 */
+public class DescendingComparator implements Comparator<Fruit> {
+    @Override
+    public int compare(Fruit o1, Fruit o2) {
+        if(o1.price < o2.price) return 1;
+        return -1;
+    }
+}
+
+/* Fruit.java - Comparable을 구현하지 않은 클래스 */
+class Fruit {
+    public String name;
+    public int price;
+
+    public Fruit(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
+}
+```
+
+> 다음 예제는 내림차순 정렬자를 이용해서 TreeSet에 Fruit을 젖아한다. 정렬자를 주지 않고 TreeSet에 저장하면 ClassCastException이 발생하지만, 정렬자를 TreeSet의 생성자에 주면 예외가 발생하지 않고 자동적으로 내림차순 정렬되는 것을 볼 수 있다.  
+
+```java
+/* Comparator.java - 내림차순 정렬자를 사용하는 TreeSet */
+public class ComparatorExample {
+    public static void main(String[] args) {
+		/*
+		TreeSet<Fruit> treeSet = new TreeSet<Fruit>();
+		//Fruit이 Comparable을 구현하지 않았기 때문에 예외 발생
+		treeSet.add(new Fruit("포도", 3000));
+		treeSet.add(new Fruit("수박", 10000));		
+		treeSet.add(new Fruit("딸기", 6000));
+		*/
+
+        TreeSet<Fruit> treeSet = new TreeSet<Fruit>(new DescendingComparator());
+        treeSet.add(new Fruit("포도", 3000));
+        treeSet.add(new Fruit("수박", 10000));
+        treeSet.add(new Fruit("딸기", 6000));
+        Iterator<Fruit> iterator = treeSet.iterator();
+        while(iterator.hasNext()) {
+            Fruit fruit = iterator.next();
+            System.out.println(fruit.name + ":" + fruit.price);
+        }
+    }
+}
+```
+
+# LIFO와 FIFO 컬렉션
+컬렉션 프레임워크에는 LIFO 자료구조를 제공하는 스택 클래스와 FIFO 자료구조를 제공하는 큐 인터페이스를 제공하고 있다.
+
+<img src=./img/JCF_12.png width="80%" style="display: block; margin: 0 auto;">
+
+스택을 응용한 대표적인 예가 JVM 스택 메모리이다. 스택 메모리에 저장된 변수는 나중에 저장된 것부터 제거된다. 큐를 응용한 대표적인 예가 스레드 풀의 작업 큐이다. 작업 큐는 먼저 들어온 것부터 처리한다.  
+
+## Stack
+
+|리턴 타입|메소드| 설명               |
+|---|---|------------------|
+|E|push(E item)| 주어진 객체를 스택에 넣는다. |
+|E|peek()|스택의 맨 위 객체를 가져온다. 객체를 스택에서 제거하지 않는다.|
+|E|pop()|스택의 맨 위 객체를 가져온다. 객체를 스택에서 제거한다.|
+
+Stack 객체를 생성하기 위해서는 저장할 객체 타입을 파라미터로 표기하고 기본 생성자를 호출하면 된다.  
+```java
+Stack<E> stack = new Stack<E>();
+```
+
+다음은 동전 케이스를 Stack 클래스로 구현한 예제이다. 먼저 넣은 동전은 아래에 깔리고, 나중에 넣은 동전이 위에 쌓이기 때문에 Stack에서 동전을 빼면 마지막에 넣은 동전이 먼저 나온다.  
+
+```java
+/* StackExample.java - Stack을 이용한 동전케이스 */
+public class StackExample {
+    public static void main(String[] args) {
+        Stack<Coin> coinBox = new Stack<Coin>();
+
+        coinBox.push(new Coin(100));
+        coinBox.push(new Coin(50));
+        coinBox.push(new Coin(500));
+        coinBox.push(new Coin(10));
+
+        while(!coinBox.isEmpty()) {
+            Coin coin = coinBox.pop();
+            System.out.println("꺼내온 동전 : " + coin.getValue() + "원");
+        }
+
+    }
+}
+
+/* Coin.java - 동전 클래스 */
+class Coin {
+    private int value;
+
+    public Coin(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}
+```
+
+### 참고
+현재 자바에서 Stack 컬렉션 사용은 권장하지 않는다. Stack의 동작이 필요한 경우 대신 Deque(ArrayDeque) 사용을 권장한다.
+
+> 🔒 Stack이 보안 측면에서 권장되지 않는 이유  
+> 1. ✅ Stack은 Vector를 상속 → 공개 API가 너무 넓음  
+>   Stack은 내부적으로 Vector를 상속하기 때문에, add(), get(), remove() 등 불필요하거나 의도하지 않은 조작이 가능함.  
+>
+> 📌 결과: 개발자가 실수로 스택 구조를 망가뜨릴 수 있어 정보 은닉(캡슐화) 실패 위험 존재.
+
+> 2. ⚠️ Stack은 동기화(synchronized)되어 있어도 불완전한 동시성 처리
+>   Vector 기반이라 메서드가 동기화되어 있지만, 메서드 간 원자적 연산을 보장하지 않음.  
+> ```java
+> if (!stack.isEmpty()) {
+>     stack.pop(); // <- 그 사이에 다른 스레드가 pop할 수도 있음
+> }
+> ```
+>📌 결과: 멀티스레드 환경에서 보안 취약점 발생 가능 (= TOCTOU: Time-of-check to time-of-use 취약점)
+
+> 3. 🚨 레거시 클래스 사용 → 유지보수 시 취약점 가능성
+>    레거시 코드는 종종 최신 보안 가이드라인이나 검사 도구의 적용에서 누락됨.
+> 코드 감사 도구(예: SonarQube, FindBugs 등)도 Stack 사용을 **"보안 경고" 또는 "코딩 표준 위반"**으로 잡음.
+
+> 4. ❗ 예측하기 어려운 동작 (API 혼용 가능)
+> ```java
+>   Stack<String> s = new Stack<>();
+>   s.add("A");
+>   s.push("B");
+>   s.insertElementAt("X", 0); // Vector에서 상속된 메서드, Stack 로직 깨뜨릴 수 있음
+> ```
+>  📌 결과: 보안적 측면에서 "제대로 제한된 데이터 구조가 아님"
+
+> ### 🔐 결론
+> 
+>| 문제 유형  | 설명                                     |
+>| ------ | -------------------------------------- |
+>| 구조적 문제 | `Vector` 상속으로 인해 불필요한 API가 노출되어 캡슐화 약함 |
+>| 동시성 문제 | synchronized라도 원자성 보장 안 됨 (멀티스레드 취약)   |
+>| 보안 감사  | 보안 도구에서 경고 발생 가능 (API 설계 불안정)          |
+>| 유지보수   | 레거시 코드 특성상 취약점 발견 가능성 증가               |
+
+ 
+
+## Queue
+
+| 리턴 타입   | 메소드        | 설명                             |
+|---------|------------|--------------------------------|
+| boolean | offer(E e) | 주어진 객체를 넣는다.                   |
+| E       | peek()     | 객체 하나를 가져온다. 객체를 큐에서 제거하지 않는다. |
+| E       | poll()     | 객체 하나를 가져온다. 객체를 큐에서 제거한다.     |
+
+Queue 인터페이스를 구현한 대표적인 클래스는 LinkedList이다. LinkedList는 List 인터페이스를 구현했기 때문에 List 컬렉션이기도 하다. 다음 코드는 LinkedList 객체를 Queue 인터페이스 타입으로 변환한 것이다.  
+
+```java
+Queue<E> queue = new LinkedList<E>();
+```
+
+> 다음은 Queue를 이용해서 간단한 메시지 큐를 구현한 예제이다. 먼저 넣은 메시지가 반대쪽으로 먼저 나오기 때문에 넣은 순서대로 메시지가 처리된다.  
+
+```java
+/* QueueExample1.java - Queue를 이용한 메시지 큐 */
+public class QueueExample {
+    public static void main(String[] args) {
+        Queue<Message> messageQueue = new LinkedList<Message>();
+
+        messageQueue.offer(new Message("sendMail", "홍길동"));
+        messageQueue.offer(new Message("sendSMS", "신용권"));
+        messageQueue.offer(new Message("sendKakaotalk", "홍두께"));
+
+        while(!messageQueue.isEmpty()) {
+            Message message = messageQueue.poll();
+            switch(message.command) {
+                case "sendMail":
+                    System.out.println(message.to + "님에게 메일을 보냅니다.");
+                    break;
+                case "sendSMS":
+                    System.out.println(message.to + "님에게 SMS를 보냅니다.");
+                    break;
+                case "sendKakaotalk":
+                    System.out.println(message.to + "님에게 카카오톡를 보냅니다.");
+                    break;
+            }
+        }
+    }
+}
+
+/* Message.java - Message 클래스 */
+class Message {
+    public String command;
+    public String to;
+
+    public Message(String command, String to) {
+        this.command = command;
+        this.to = to;
+    }
+}
+```
+
+# 동기화된 컬렉션
+> 컬렉션 프레임 워크의 대부분의 클래스들은 싱글 스레드 환경에서 사용할 수 있도록 설계되었다. 그렇기 때문에 여러 스레드가 동시에 컬렉션에 접근한다면 의도하지 않게 요소가 변경될 수 있는 불안전한 상태가 된다. Vector와 HashTable을 제외한 모든 컬렉션은 동기화된 메소드로 구성되어 있지 않아 멀티 스레드 환경에서 안전하지 않다.  
+
+> 경우에 따라서는 ArrayList, HashSet, HashMap을 싱글 스레드 환경에서 사용하다가 멀티 스레드 환경으로 전달할 필요도 있을 것이다. 이런 경우를 대비해서 컬렉션 프레임워크는 비동기화된 메소드를 동기화된 메소드로 래핑하는 Collections의 synchronizedXXX() 메소드를 제공하고 있다. 매개값으로 비동기화된 컬렉션을 대입하면 동기화된 컬렉션을 리턴한다.  
+
+| 리턴 타입    | 메소드(매개변수)                      | 설명                  |
+|----------|--------------------------------|---------------------|
+| List<T>  | synchronizedList(List<T> list) | List를 통기화된 List로 리턴 |
+| Map<K,V> | synchronizedMap(Map<K,V> m)    | Map을 통기화된 Map으로 리턴  |
+| Set<T>   | synchronizedSet(Set<T> s)      | Set을 통기화된 Set으로 리턴  |
+
+<img src=./img/JCF_13.png width="80%" style="display: block; margin: 0 auto;">
+<img src=./img/JCF_14.png width="80%" style="display: block; margin: 0 auto;">
+
+# 병렬 처리를 위한 컬렉션
+> 동기화된 컬렉션은 멀티 스레드 환경에서 하나의 스레드가요소를 안전하게 처리하도록 도와주지만, 전체 요소를 빠르게 처리하지는 못한다. 하나의 스레드가 요소를 처리할 때 전체 잠금이 발생하여 다른 스레드는 대기 상태가 된다. 그렇기 때문에 멀티 스레드가 병렬적으로 컬렉션의 요소들을 처리할 수 없다. 자바는 멀티 스레드가 컬렉션의 요소를 병렬적으로 처리할 수 있도록 특별한 컬렉션을 제공하고 있다. java.util.concurrent 패키지의 `ConcurrentHashMap`과 `ConcurrentLinkedQueue`이다. `ConcurrentHashMap`은 Map 구현 클래스이고, `ConcurrentLinkedQueue`는 Queue 구현 클래스이다.  
+
+> ConcurrentHashMap을 사용하면 스레드에 안전하면서도 멀티스레드가 요소를 병렬적으로 처리할 수 있다. 이것이 가능한 이유는 ConcurrentHashMap은 부분(segment) 잠금을 사용하기 때문이다. 컬렉션에 10개의 요소가 저장되어 있을 경우, 1개를 처리할 동안 전체 10개의 요소를 다른 스레드가 처리하지 못하도록 하는 것이 전체 잠금이라면, 처리하는 요소가 포함된 부분만 잠금하고 나머지 부분은 다른 스레드가 변경할 수 있도록 하는 것이 부분 잠금이다. 다음은 ConcurrentHashMap 객체를 생성하는 코드이다. 사용하는 방법은 다른 Map 구현 객체와 마찬가지로 Map 인터페이스의 메소드를 호출하면 된다.  
+
+```java
+Map<K,V> map = new ConcurrentHashMap<K,V>();
+```
+
+> ConcurrentLinkedQueue는 락-프리(lock-free) 알고리즘을 구현한 컬렉션이다. 락-프리 알고리즘은 여러 개의 스레드가 동시에 접근할 경우, 잠금을 사용하지 않고도 최소한 하나이 스레드가 안전하게 요소를 저장하거나 얻도록 해준다. 다음은 ConcurrentLinkedQueue를 생성하는 코드이다.  
+
+```java
+Queue<E> queue = new ConcurrentLinkedQueue<E>();
+```
+
+> 다른 Queue 구현 객체와 마찬가지로 Queue 인터페이스의 메소드를 호출하면 된다. 
+
+## [연습문제 풀이](./ChapterTest.md)
