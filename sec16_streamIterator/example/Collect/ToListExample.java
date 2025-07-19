@@ -49,6 +49,13 @@ class Student$1 {
         this.sex = sex;
     }
 
+    public Student$1(String name, int score, Sex sex, City city) {
+        this.name = name;
+        this.score = score;
+        this.sex = sex;
+        this.city = city;
+    }
+
     public String getName() { return name; }
     public int getScore() { return score; }
     public Sex getSex() { return sex; }

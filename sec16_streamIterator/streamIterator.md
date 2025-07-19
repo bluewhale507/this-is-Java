@@ -404,7 +404,7 @@ public class FilteringExample {
 ## flatMapXXX() 메소드
 flatMapXXX() 메소드는 요소를 대체하는 복수 개의 요소들로 구성된 새로운 스트림을 리턴한다. 아래 그림을 예로들면 스트림에서 A라는 요소는 A1, A2 요소로 대체되고, B라는 요소는 B1, B2로 대체된다고 가정했을 경우, A1, A2, B1, B2 요소를 가지는 새로운 스트림이 생성된다.  
 
-<img src="img/stream_12.png" style="display:block; margin: 0 auto" width=100%>
+<img src="img/stream_12.png" style="display:block; margin: 0 auto" width=80%>
 
 flatMapXXX() 메소드의 종류는 다음과 같다.  
 
@@ -443,6 +443,8 @@ public class FlatMapExample {
 
 ## mapXXX() 메소드
 mapXXX() 메소드는 요소를 대체하는 요소로 구성된 새로운 스트림을 리턴한다. 다음 그림을 보면서 이해해보자. 스트림에서 A요소는 C요소로 대체되고, B요소는 D요소로 대체된다고 했을 경우, C, D 요소를 가지는 새로운 스트림이 생성된다.  
+
+<img src="img/stream_12a.png" style="display:block; margin: 0 auto" width=80%>
 
 | 리턴 타입        | 메소드(매개변수)                         | 요소->대체요소     |
 |--------------|-----------------------------------|--------------|
@@ -1157,7 +1159,7 @@ public class MaleStudentExample {
 ## 요소를 그룹핑해서 수집
 collect() 메소드는 단순히 요소를 수집하는 기능 이외에 컬렉션의 요소들을 그룹핑해서 Map객체를 생성하는 기능도 제공한다. collect()를 호출할 때 Collectors의 groupingBy() 또는 groupingByConcurrent() 가 리턴하는 Collector를 매개값으로 대입하면 된다.  
 
-<img src="img/stream_13.png" style="display:block; margin: 0 auto" width=100%>
+<img src="img/stream_13.png" style="display:block; margin: 0 auto" width=80%>
 
 > 다음 코드는 학생들을 성별로 그룹핑하고 나서, 같은 그룹에 속하는 학생 List를 생성한 후, 성별을 키로, 학생 List를 값으로 갖는 Map을 생성한다.collect()의 매개값으로 groupingBy(Function<T,K> classifier)를 사용하였다.
 
@@ -1182,6 +1184,397 @@ Map<Student.Sex, List<Student>> mapBySex = totalList.stream()
 다음 코드는 학생들을 거주도시별로 그룹핑하고 나서, 같은 그룹에 속하는 학생들의 이름 List를 생성한 후, 거주 도시를 키로, 이름 List를 값으로 갖는 Map을 생성한다. collect()의 매개값으로 groupingBy(Function <T,K> classifier, Collection<T,A,D> collector)를 사용하였다.  
 
 ```java
-// 전체 학생 List에서 Strea을 얻는다.
+// 전체 학생 List에서 Stream을 얻는다.
 1. Stream<Student> totalList.stream();
+// Student를 Student.City로 매핑하는 Function을 얻는다.
+2. Fucntion<Student, Student.City> classifier = Student::getCity;
+// 3~5 Student의 이름을 List에 수집하는 Collector를 얻는다.
+// Student의 이름으로 매핑하는 Function을 얻는다.
+3. Function<Student, String> mapper = Student::getName;
+// 이름을 List에 수집하는 Collector를 얻는다.
+4. Collector<String, ?, List<String>> collector1 = Collector.toList();
+// Collectors의 mapping() 메소드로 Student를 이름으로 매핑하고 List에 수집하는 Collector를 얻는다.  
+5. Collector<Student, ?, List<String>> collector2 = Collectors.mapping(mapper, collector1);
+// Student.City가 Key이고 그룹핑된 이름 List가 값인 Map을 생성하는 Collector를 얻는다.  
+6. Collector<Student, ?, Map<Student.City, List<String>>> collector3 = Collectors.groupingBy(classifier, collector2);
+// Stream의 collect() 메소드로 Student를 Student.City 별로 그룹핑해서 Map을 얻는다.
+7. Map<Student.City, List<String>> mapByCIty = totalStream.collect(Collector3);
 ```
+
+> public static <T,U,A,R> Collector<T,?,R> **mapping**(Function<? super T,? extends U> mapper, Collector<? super U,A,R> downstream)  
+> => 축적 전에 각 입력 요소에 매핑 함수를 적용함으로써 유형 U의 요소를 하나의 유형 T 요소로 수락하는 수집기를 적응시킨다.  
+> => Mapping () 수집기는 Groupingby 또는 Partitioningby의 다운 스트림과 같은 다중 레벨 감소에 사용될 때 가장 유용합니다. 예를 들어, 사람의 흐름이 주어지면 각 도시의 성 세트를 축적합니다.
+
+상기 코드에서 변수를 생략하면 아래와 같이 간단하게 작성할 수 있다.  
+
+```java
+Map<Student.City, List<String>> mapByCity = totalList.stream()
+        .collect(
+                Collectors.groupingBy(
+                        Stduent::getCity,
+                        Collectors.mapping(Student::getName, Collectors.toList())
+                )
+        );
+```
+
+다음 코드는 위와 동일한데, TreeMap 객체를 생성하도록 groupingBy(Function<T,K> classifier, Supplier<Map<K,D>> mapFactory, Collector<T,A,D> collector) 를 사용하였다.  
+
+```java
+Map<Student.City, List<String>> mapByCity = totalList.stream()
+        .collect(
+                Collectors.groupingBy(
+                    Student::getCity,   
+                    TreeMap::new,
+                    Collectors.mapping(Student::getName, Collectors.toList())
+                )
+        );
+```
+
+```java
+/* GroupingByExample.java - 성별로 그룹핑하기 */
+public class GroupingByExample {
+    public static void main(String[] args) {
+        List<Student> totalList = Arrays.asList(
+                new Student("홍길동", 10, Student.Sex.MALE, Student.City.Seoul),
+                new Student("김수애", 6, Student.Sex.FEMALE, Student.City.Pusan),
+                new Student("신용권", 10, Student.Sex.MALE, Student.City.Pusan),
+                new Student("박수미", 6, Student.Sex.FEMALE, Student.City.Seoul)
+        );
+
+        Map<Student.Sex, List<Student>> mapBySex = totalList.stream()
+                .collect(Collectors.groupingBy(Student :: getSex));
+        System.out.print("[남학생] ");
+        mapBySex.get(Student.Sex.MALE).stream().forEach(s->System.out.print(s.getName() + " "));
+        System.out.print("\n[여학생] ");
+        mapBySex.get(Student.Sex.FEMALE).stream().forEach(s->System.out.print(s.getName() + " "));
+
+        System.out.println();
+
+        Map<Student.City, List<String>> mapByCity = totalList.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Student::getCity,
+                                Collectors.mapping(Student::getName, Collectors.toList())
+                        )
+                );
+        System.out.print("\n[서울] ");
+        mapByCity.get(Student.City.Seoul).stream().forEach(s->System.out.print(s + " "));
+        System.out.print("\n[부산] ");
+        mapByCity.get(Student.City.Pusan).stream().forEach(s->System.out.print(s + " "));
+    }
+}
+```
+
+## 그룹핑 후 매핑 및 집계
+Collectors.groupingBy() 메소드는 그룹핑 후, 매핑이나 집계(평균, 카운팅, 연결, 최대, 최소, 합계)를 할 수 있도록 두 번째 매개값으로 Collector를 가질 수 있다. 이전 예제에서 그룹핑된 학생 객체를 학생 이름으로 매핑하기 위해 mapping() 메소드로 Collectors를 얻었다. Collectors는 mapping() 메소드 이회에도 집계를 위해 다양한 Collector를 리턴하는 다음과 같은 메소드를 제공하고 있다.  
+
+| 리턴 타입                                   | 메소드(매개 변수)                                                                                    | 설명                                                |
+|-----------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------------------------------|
+| Collectors<T, ?, R>                     | mapping(<br/>Function<T,U> mapper,<br/>Collector<U,A,R> collector)                            | T를 U로 매핑한 후, U를 R에 수집                             |
+| Collector<T, ?, Double>                 | averagingDouble(<br/>ToDoubleFunction<T> mapper)                                              | T를 Double로 매핑한 후, Double의 평균값을 산출                 |
+| Collector<T, ?, Long>                   | counting()                                                                                    | T의 카운팅 수를 산출                                      |
+| Collector<br/><CharSequence, ?, String> | joining(CharSequence delimiter)                                                               | CharSequence를 구분자<br/>(delimiter)로 연결한 String을 산출 |
+| Collector<T, ?, Optional<T>>            | maxBy(Comparator<T> comparator)                                                               | Comparator를 이용해서 최대 T를 산출                         |
+| Collector<T, ?, Optional<T>>            | minBy(Comprator<T> comparator)                                                                | Comparator를 이용해서 최소 T를 산출                         |
+| Collector<T, ?, Integer>                | summingInt(ToIntFunction)<br/>summingLong(ToLongFunction)<br/>summingDouble(ToDoubleFunction)| Int, Long, Double 타입의 합계 산출                       |                                                   
+
+다음 코드는 학생들을 성별로 그룹핑한 다음 같은 그룹에 속하는 학생들의 평균 점수를 구하고, 성별을 키로, 평균 점수를 값으로 갖는 Map을 생성한다.  
+
+```java
+// 전체 학생 List에서 Stream을 얻는다.
+1. Stream<Student> totalStrema = totalList.stream();
+// Student를 Student.Sex로 매핑하는 Function을 얻는다.
+2. Function<Student, Student.Sex> classfier = Student :: getSex;
+// Student를 점수로 매핑하는 ToDoubleFunction을 얻는다.
+3. ToDoubleFunction<Student> mapper = Student::getScore;
+// 학생 점수의 평균을 산출하는 Collector를 얻는다.
+4. Collector<Student, ?, Double> collector1 = Collectors.averagingDouble(mapper);
+// Student.Sex가 키이고, 평균 점수 Double이 값인 Map을 생성하는 Collector를 얻는다.
+5. Collector<Student, ?, Map<Student.Sex, Double>> collector2 = Collectors.groupingBy(classifier, collector1);
+// Stream의 collect() 메소드로 Student를 Student.Sex별로 그룹핑해서 Map을 얻는다.
+6. Map<Student.Sex, Double> mapBySex = totalStream.collect(collect2);
+```
+
+변수를 생략하여 아래와 같이 표현할 수 있다.  
+
+```java
+Map<Student.Sex, Double> mapBySex = totalList.stream()
+        .collect(
+                Collectors.groupingBy(
+                        Student::getSex,
+                        Collectors.averagingDouble(Student::getScore)
+                )
+        );
+```
+
+다음 코드는 학생들을 성별로 그룹핑한 다음 같은 그룹에 속하는 학생 이름을 쉼표로 구분해서 문자열로 만들고, 성별을 Key로, 이름 문자열을 Value 값으로 갖는 Map을 생성한다.
+
+```java
+Map<Student.Sex, String> mapByName = totalList.stream()
+        .collect(
+                Collectors.groupingBy(
+                        Student::getSex,
+                        Collectors.mapping(
+                                Student::getName,
+                                Collectors.joining(",")
+                        )
+                )
+        );
+```
+
+```java
+/* GroupingAndReductionExapmle.java - 그룹핑 후 리덕션 */
+public class GroupingAndReductionExapmle {
+    public class GroupingAndReductionExample {
+        public static void main(String[] args) {
+            List<Student$1> totalList = Arrays.asList(
+                    new Student$1("홍길동", 10, Student$1.Sex.MALE),
+                    new Student$1("김수애", 12, Student$1.Sex.FEMALE),
+                    new Student$1("신용권", 10, Student$1.Sex.MALE),
+                    new Student$1("박수미", 12, Student$1.Sex.FEMALE)
+            );
+
+            //성별로 평균 점수를 저장하는 Map 얻기
+            Stream<Student$1> totalStream = totalList.stream();
+            Function<Student$1, Student$1.Sex> classifier = Student$1 :: getSex;
+            ToDoubleFunction<Student$1> mapper = Student$1 :: getScore;
+            Collector<Student$1, ?, Double> collector1 = Collectors.averagingDouble(mapper);
+            Collector<Student$1, ?, Map<Student$1.Sex, Double>> collector2 = Collectors.groupingBy(classifier, collector1);
+            Map<Student$1.Sex, Double> mapBySex = totalStream.collect(collector2);
+
+		/*Map<Student$1.Sex, Double> mapBySex = totalList.stream()
+				.collect(
+					Collectors.groupingBy(
+						Student$1 :: getSex,
+						Collectors.averagingDouble(Student$1 :: getScore)
+					)
+				);*/
+
+            System.out.println("남학생 평균 점수: " + mapBySex.get(Student$1.Sex.MALE));
+            System.out.println("여학생 평균 점수: " + mapBySex.get(Student$1.Sex.FEMALE));
+
+            //성별로 쉼표로 구분된 이름을 저장하는 Map 얻기
+            Map<Student$1.Sex, String> mapByName = totalList.stream()
+                    .collect(
+                            Collectors.groupingBy(
+                                    Student$1 :: getSex,
+                                    Collectors.mapping(
+                                            Student$1 :: getName,
+                                            Collectors.joining(",")
+                                    )
+                            )
+                    );
+            System.out.println("남학생 전체 이름: " + mapByName.get(Student$1.Sex.MALE));
+            System.out.println("여학생 전체 이름: " + mapByName.get(Student$1.Sex.FEMALE));
+        }
+    }
+}
+```
+
+# 병렬 처리
+병렬 처리(Parallel Operation)란 멀티 코어 CPU 환경에서 하나의 작업을 분할해서 각각의 코어가 병렬적으로 처리하는 것을 말하는데, 병렬 처리의 목적은 작업 처리 시간을 줄이기 위한 것이다. 자바 8부터 요소를 병렬 처리할 수 있도록 하기 위해 병렬 스트림을 제공하기 때문에 컬렉션(배열)의 전체 요소 처리 시간을 줄여 준다.  
+
+## 동시성(Concurrency)과 병렬성(Parallelism)
+멀티 스레드는 동시성 또는 병렬성으로 실행되기 때문에 이 용어들에 대해 정확히 이해하는 것이 좋다. 이 둘은 멀티 스레드의 동작 방식이라는 점에서는 동일하지만 서로 다른 목적을 가지고 있다. 동시성은 멀티 작업을 위해 멀티 스레드가 번갈아 가며 실행하는 성질을 말하고, 병렬성은 멀티 작업을 위해 멀티 코어를 이용해서 동시에 실행하는 성질을 말한다. 싱글 코어 CPU를 이용한 작업은 병렬적으로 실행되는 것처럼 보이지만, 사실은 번갈아 가며 실행하는 동시성 작업이다. 번갈아가며 실행하는 것이 워낙 빠르다 보니 병렬성으로 보일 뿐이다.  
+
+<img src="img/stream_14.png" style="display:block; margin: 0 auto" width=100%>
+
+병렬성은 데이터 병렬성과 작업 병렬성으로 구분할 수 있다.  
+
+**데이터 병렬성**  
+데이터 병렬성은 전체 데이터를 쪼개어 서브 데이터들로 만들고 이 서브 데이터들을 병렬 처리해서 작업을 빨리 끝내는 것을 말한다. 자바 8에서 지원하는 병렬 스트림은 데이터 병렬성을 구현한 것이다. 멀티 코어의 수만큼 대용량 요소를 서브 요소들로 나누고, 각각의 서브 요소들을 분리된 스레드에서 병렬 처리시킨다. 예를 들어 쿼드 코어 CPU일 경우 4개의 서브 요소들로 나누고, 4개의 스레드가 각각의 서브 요소들을 병렬 처리한다.  
+
+**작업 병렬성**  
+작업 병렬성은 서로 다른 작업을 병렬 처리하는 것을 말한다. 작업 병렬성의 대표적인 예는 웹 서버이다. 웹 서버는 각각의 브라우저에서 요청한 내용을 개별 스레드에서 병렬로 처리한다.  
+
+## 포크조인(ForkJoin) 프레임 워크
+병렬 스트림은 요소들을 병렬 처리하기 이ㅜ해 포크조인 프레임워크를 사용한다. 병렬 스트림을 이용하면 런타임 시에 포크조인 프레임 워크가 동작하는데, 포크 단계에서는 전체 데이터를 서브 데이터로 분리한다. 그리고 나서 서브 데이터를 멀티 코어에서 병렬로 처리한다. 조인 단계에서는 서브 결과를 결합해서 최종 결과를 만들어 낸다. 예를 들어 쿼드 코어 CPU에서 병렬 스트림으로 작업을 처리할 경우, 스트림으 요소를 N개라고 보았을 때 포크 단계에서는 전체 요소를 4등분 한다. 그리고 1등분씩 개별 코어에서 처리하고 조인 단계에서는 3번의 결합과정을 거쳐 최종 결과를 산출한다.  
+
+<img src="img/stream_15.png" style="display:block; margin: 0 auto" width=100%>
+
+병렬 처리 스트림은 실제로 포크 단계에서 차례대로 요소를 4등분하지 않는다. 이해하기 쉽도록 하기 위해 위 그림은 차례대로 4등분했지만, 내부적으로 서브 요소를 나누는 알고리즘이 있다. 포크조인 프레임워크는 포크와 조인 기능 이외에 스레드풀인 ForkJoinPool을 제공한다. 각각의 코어에서 서브 요소를 처리하는 것은 개별 스레드가 해야 하므로 스레드 관리가 필요하다. 포크조인 프레임워크는 ExecutorService의 구현 객체인 ForkJoinPool을 사용해서 작업 스레드를 관리한다.  
+
+<img src="img/stream_16.png" style="display:block; margin: 0 auto" width=90%>
+
+## 병렬 스트림 생성
+병렬 처리를 위해 코드에서 포크조인 프레임워크를 직접 사용할 수는 있지만, 병렬 스트림을 이용할 경우에는 백그라운드에서 포크조인 프레임워크가 사용되기 때문에 개발자는 매우 쉽게 병렬 처리를 할 수 있다. 병렬 스트림은 다음 두 가지 메소드로 얻을 수 있다.  
+
+| 인터페이스                                                                                                                    | 리턴 타입                                                | 메소드(매개 변수) |
+|--------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------|------------|
+| java.util.Collection                                                                                                     | Stream                                               | parallelStream() |
+| java.util.Stream.Stream<br/>java.util.Stream.IntStream<br/>java.util.Stream.LongStream<br/>java.util.Stream.DoubleStream | Stream<br/>IntStream<br/>LongStream<br/>DoubleStream | parallel() |
+
+parallelStream() 메소드는 컬렉션으로부터 병렬 스트림을 바로 리턴한다. parallel() 메소드는 순차 처리 스트림을 병렬 처리 스트림으로 변환해서 리턴한다. 어떤방법으로 병렬 스트림을 얻더라도 이후 요소 처리 과정은 병렬 처리된다. 내부적으로 전체 요소를 서브 요소들로 나누고, 이 서브 요소들을 개별 스레드가 처리한다. 서브 처리 결과가 나오면 결합해서 마지막으로 최종 처리 결과를 리턴한다. 내부적인 동작을 확인하려면 16.11.2 사용자 정의 컨테이너에 수집하기에서 살펴본 예제를 병렬 스트림으로 수정해서 실행해보면 된다. 먼저 수정 전의 코드를 보자.  
+
+```java
+MaleStudent maleStudent = totalList.stream()
+        .filter(s->s.getSex()==Student.Sex.MALE)
+        .collect(MaleStudent::new, MaleStudent::accumulate, MaleStudent::combine);
+```
+
+전체 학생 목록에서 stream() 메소드로 순차 처리 스트림을 얻었기 때문에 MaleStudent 객체는 하나만 생성되고, 남학생을 MaleStudent에 수집하기 위해 accumulate()가 호출된다. combine() 메소드는 전혀 호출되지 않는데, 그 이유는 순차 처리 스트림이므로 결합할 서브 작업이 없기 때문이다. 이 코드르 병렬 처리 스트림으로 변경하면 다음과 같다.  
+
+```java
+MaleStudent maleStudent = totalList.parallelStream()
+        .filter(s->s.getSex()==Student.Sex.Male)
+        .collect(MaleStudent::new, MaleStudent::accumulate, MaleStudent::combine);
+```
+
+단순히 stream() 메소드 호출이 parallelStream() 메소드 호출로 변경되었지만 내부 동작은 다음과 같은 순서로 전혀 다르게 진행된다.  
+
+1. 쿼드 코어 CPU에서 실행된다면 전체 요소는 4개의 서브 요소로 나눠지고, 4개의 스레드가 병렬 처리한다. 각 스레드는 서브 요소를 수집해야 하므로 4개의 MaleStudent 객체를 생성하기 위해 collect()의 첫 번째 메소드 참조인 MaleStudent::new를 4번 실행시킨다.  
+2. 각 스레드는 MaleStudent 객체에 남학생 요소를 수집하기 위해 두 번째 메소드 참조인 MaleStudent :: accumulate를 매번 실행시킨다.  
+3. 수집이 완료된 4개의 MaleStudent는 3번의 결합으로 최종 MaleStudent가 만들어질 수 있으므로 세 번째 메소드 참조인 MaleStudent :: combine이 3번 실행된다.  
+
+```java
+public class MaleStudentExample {
+    public static void main(String[] args) {
+        List<Student$1> totalList = Arrays.asList(
+                new Student$1("홍길동", 10, Student$1.Sex.MALE),
+                new Student$1("김수애", 6, Student$1.Sex.FEMALE),
+                new Student$1("신용권", 10, Student$1.Sex.MALE),
+                new Student$1("박수미", 6, Student$1.Sex.FEMALE)
+        );
+        // 병렬 처리
+        MaleStudent maleStudent = totalList.parallelStream()
+                .filter(s -> s.getSex() == Student$1.Sex.MALE)
+                .collect(MaleStudent :: new, MaleStudent :: accumulate, MaleStudent :: combine);
+
+        maleStudent.getList().stream()
+                .forEach(s -> System.out.println(s.getName()));
+    }
+}
+```
+
+실행 결과를 보면 main 스레드와 ForkJoinPool에서 3개의 스레드가 사용되어 총 4개의 스레드가 동작한다. 이것은 집필자의 컴퓨터가 쿼드 코어 CPU를 사용하기 때문이다. 각각의 스레드가 하나의 서브 작업이라고 본다면 총 4개의 서브 작업으로 분리되었다고 생각하면 된다. 각 서브 작업은 남학생을 누적시킬 MaleStudent 객체를 별도로 생성하기 때문에 MaleStudent() 생성자가 4번 실행되었다. 하지만 전체 학생 중에서 남학생이 2명밖에 없으므로 accumulate()는 2번 밖에 호출되지 않았다. 누적이 완료된 4개의 MaleStudent 객체는 3번의 결합으로 최종 MaleStudent가 만들어지므로 combine() 메소드가 3번 호출되었다.  
+
+다음은 학생수를 100명으로 늘리고 쿼드 코어 CPU에서 테스트한 결과를 보여준다. 4개의 코어가 병렬적으로 요소를 처리하고 있는 모습을 볼 수 있다.
+<img src="img/stream_17.png" style="display:block; margin: 0 auto" width=90%>
+
+## 병렬 처리 성능
+스트림 병렬 처리가 스트림 순차 처리보다 항상 실행 성능이 좋다고 판단해서는 안된다. 병렬 처리에 영향을 미치는 다음 3가지 요인을 잘 살펴 보아야한다.  
+
+**요소의 수와 요소당 처리시간**  
+컬렉션에 요소의 수가 적고 요소당 처리시간이 짧으면 순차 처리가 오히려 병렬 처리보다 빠를 수 있다. 병렬 처리는 스레드풀 생성, 스레드 생성이라는 추가적인 비용이 발생하기 때문이다.  
+
+**스트림 소스의 종류**  
+ArrayList, 배열은 인덱스로 요소를 관리하기 때문에 포크 단계에서 요소를 쉽게 분리할 수 있어 병렬 처리 시간이 절약된다. 반면에 HashSet, TreeSet은 요소 분리가 쉽지 않고, LinkedList 역시 링크를 따라가야 하므로 요소 분리가 쉽지 않다. 따라서 이 소스들은 ArrayList, 배열보다는 상대적으로 병렬 처리가 늦다.  
+
+**코어(Core)의 수**  
+싱글 코어 CPU일 경우에는 순차 처리가 빠르다. 병렬 스트림을 사용할 경우 스레드의 수만 증가하고 동시성 작업으로 처리되기 때문에 좋지 못한 결과를 준다. 코어의 수가 많으면 많을 수록 병렬 작업 처리 속도는 빨라진다.  
+
+> 다음 예제는 work() 메소드의 실행시간(요소당 처리 시간)을 조정함으로써 순차 처리와 병렬 처리 중 어떤것이 전체 요소를 빨리 처리하는지 테스트한다.  
+
+```java
+import java.util.Arrays;
+import java.util.List;
+
+public class SequencialVsParallelExample {
+	//요소 처리
+	public static void work(int value) {
+		try { Thread.sleep(100); } catch (InterruptedException e) {}
+	}
+
+	//순차 처리
+	public static long testSequencial(List<Integer> list) {
+		long start = System.nanoTime();
+		list.stream().forEach((a) -> work(a));
+		long end = System.nanoTime();
+	    long runTime = end - start;
+	    return runTime;
+	}
+	
+	//병렬 처리
+	public static long testParallel(List<Integer> list) {
+		long start = System.nanoTime();
+		list.stream().parallel().forEach((a)-> work(a));
+		long end = System.nanoTime();
+	    long runTime = end - start;
+	    return runTime;
+	}
+	
+	public static void main(String... args) {
+		//소스 컬렉션
+		List<Integer> list = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+		
+		//순차 스트림 처리 시간 구하기
+		long Sequencial = testSequencial(list);
+		
+		//병렬 스트림 처리 시간 구하기
+		long timeParallel = testParallel(list);
+		
+		if(Sequencial < timeParallel) {
+			System.out.println("성능 테스트 결과: 순차 처리가 더빠름");
+		} else {
+			System.out.println("성능 테스트 결과: 병렬 처리가 더빠름");
+		}
+	}
+}
+
+```
+
+이 예제의 실행 결과는 work()의 요소 처리 시간에 따라 달라진다. 내 노트북 기준으로 (12코어 16스레드) Thread.sleep(0)으로 실행하면 순차처리가 더 빨랐다. 그렇기 때문에 실제 작업내용을 작성한 후에는 순차처리와 병렬 처리 중 어떤 처리가 더 유리한지 테스트해 보아야 한다.  
+
+> 다음 예제는 스트림 소스가 ArrayList인 경우와 LinkedList일 경우 대용량 데이터의 병렬 처리 성능을 테스트한 것이다. 백만 개의 Integer 객체를 각각 ArrayList와 LinkedList에 저장하고 테스트하였다.  
+
+```java
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class ArrayListVsLinkedListExample {
+    //요소 처리
+    public static void work(int value) {
+    }
+
+    //병렬 처리
+    public static long testParallel(List<Integer> list) {
+        long start = System.nanoTime();
+        list.stream().parallel().forEach((a)-> work(a));
+        long end = System.nanoTime();
+        long runTime = end - start;
+        return runTime;
+    }
+
+    public static void main(String... args) {
+        //소스 컬렉션
+        List<Integer> arrayList = new ArrayList<Integer>();
+        List<Integer> linkedList = new LinkedList<Integer>();
+        for(int i=0; i<1000000; i++) {
+            arrayList.add(i);
+            linkedList.add(i);
+        }
+
+        //워밍업
+        long arrayListListParallel = testParallel(arrayList);
+        long linkedListParallel = testParallel(linkedList);
+
+        //병렬 스트림 처리 시간 구하기
+        arrayListListParallel = testParallel(arrayList);
+        linkedListParallel = testParallel(linkedList);
+
+        if(arrayListListParallel < linkedListParallel) {
+            System.out.println("성능 테스트 결과: ArrayList 처리가 더빠름");
+        } else {
+            System.out.println("성능 테스트 결과: LinkedList 처리가 더빠름");
+        }
+    }
+}
+```
+
+실행 결과는 ArrayList가 빠른 실행 성능을 보였다. 하지만 요소의 개수가 적을 경우에는 LinkedList가 더 빠른 성능을 보였다. 29~30라인에서 워밍업을 둔 이유는 실행 준비 과정에서의 오차를 줄이기 위해서이다.
+
+> **✅ 워밍업이란?**  
+> 자바에서 **JVM의 JIT(Just-In-Time 컴파일러)** 가 본격적으로 최적화된 성능을 내기 전에, 코드를 미리 한두 번 실행해 캐시를 채우고 컴파일을 유도하는 과정입니다.
+
+> **✅ 왜 워밍업이 필요한가?**  
+> Java는 처음 실행되는 코드를 바이트코드 인터프리터 방식으로 실행하다가, 반복적으로 실행되는 코드에 대해서는 JIT 컴파일러가 기계어로 최적화합니다. 이 때문에 처음 실행된 결과는 "실제 성능"이 아닐 수 있습니다.  
+
+> **📌 워밍업 없이 성능 측정하면**  
+> - 캐시 미적용  
+> - 최적화 전 코드 실행  
+> - GC나 기타 초기 동작이 개입  
+>
+> **➡️ 측정값이 흔들리고 신뢰도가 낮음**
+
+## [연습문제 풀이](./ChapterTest.md)

@@ -12,7 +12,11 @@ public class MaleStudentExample {
                 new Student$1("박수미", 6, Student$1.Sex.FEMALE)
         );
 
-        MaleStudent maleStudent = totalList.stream()
+        //순차 처리
+        //MaleStudent maleStudent = totalList.stream()
+
+        // 병렬 처리
+        MaleStudent maleStudent = totalList.parallelStream()
                 .filter(s -> s.getSex() == Student$1.Sex.MALE)
                 //.collect(MaleStudent :: new, MaleStudent :: accumulate, MaleStudent :: combine);
                 .collect(()->new MaleStudent(), (r, t)->r.accumulate(t), (r1, r2)->r1.combine(r2));
