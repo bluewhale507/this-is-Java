@@ -60,7 +60,60 @@ public interface MyFunctionalInterface {
 }
 ```
 
+#### 참고 
+
+> **✅ 함수형 인터페이스의 목적**  
+> 
+> **1. 람다식을 사용할 수 있게 하기 위해 자바는 함수형 언어가 아니기 때문에, 람다식을 타입으로 받아줄 대상이 필요한데, 자바에서는 그 역할을 함수형 인터페이스가 합니다.**
+>
+>```java
+> @FunctionalInterface
+> interface MyFunction {
+>     void doSomething();
+> }
+>
+> MyFunction f = () -> System.out.println("람다 실행"); // 람다식을 변수에 대입
+> f.doSomething(); // 출력: 람다 실행
+> ```
+> 이때 MyFunction이 없으면 () -> {}는 아무 타입에도 들어갈 수 없기 때문에 컴파일 오류가 납니다.
+> 
+> **2. 메서드의 인자로 람다를 전달하기 위해**
+> ```java
+> public class Runner {
+>   public static void execute(MyFunction func) {
+>       func.doSomething(); // 전달받은 람다 실행
+>   }
+>   
+>   public static void main(String[] args) {
+>       execute(() -> System.out.println("실행됨")); // ✅ 람다식을 매개변수로 전달
+>   }
+> }
+> ```
+> 여기서 execute는 MyFunction을 인자로 받는데, 이 자리에 람다식이 들어갈 수 있는 이유는 MyFunction이 함수형 인터페이스이기 때문입니다.
+>
+> **3. 코드를 더 간결하게 하기 위해**
+> 
+> ***익명 클래스***
+> 
+> ```java
+> Runnable r = new Runnable() {
+>   public void run() {
+>       System.out.println("작업 실행");
+>   }
+> };
+> ```
+> ***람다***
+> ```java 
+> Runnable r = () -> System.out.println("작업 실행");
+> ```
+> 
+> 람다식은 익명 클래스보다 훨씬 간결하게 코드를 표현할 수 있습니다:
+
+
+
+
 ### 매개변수와 리턴값이 없는 람다식
+
 ```java
 @FunctionalInterface
 public interface MyFunctionalInterface {
