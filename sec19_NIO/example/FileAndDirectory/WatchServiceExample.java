@@ -11,7 +11,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
 
-public class WatchServiceExample extends {
+public class WatchServiceExample {
     class WatchServiceThread extends Thread {
         @Override
         public void run() {
@@ -30,14 +30,14 @@ public class WatchServiceExample extends {
                         Kind kind = watchEvent.kind();
                         // 감지된 Path 얻기
                         Path path = (Path)watchEvent.context();
-                        if(kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                            Platform.runLater(()->textArea.appendText("            -> " + path.getFileName() + "\n"));
-                        } else if(kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                            Platform.runLater(()->textArea.appendText("            -> " + path.getFileName() + "\n"));
-                        } else if(kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                            Platform.runLater(()->textArea.appendText("           -> " + path.getFileName() + "\n"));
-                        } else if(kind == StandardWatchEventKinds.OVERFLOW) {
-                        }
+//                        if(kind == StandardWatchEventKinds.ENTRY_CREATE) {
+//                            Platform.runLater(()->textArea.appendText("            -> " + path.getFileName() + "\n"));
+//                        } else if(kind == StandardWatchEventKinds.ENTRY_DELETE) {
+//                            Platform.runLater(()->textArea.appendText("            -> " + path.getFileName() + "\n"));
+//                        } else if(kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+//                            Platform.runLater(()->textArea.appendText("           -> " + path.getFileName() + "\n"));
+//                        } else if(kind == StandardWatchEventKinds.OVERFLOW) {
+//                        }
                     }
                     boolean valid = watchKey.reset();
                     if(!valid) { break; }
@@ -48,27 +48,27 @@ public class WatchServiceExample extends {
 
     TextArea textArea;
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        BorderPane root = new BorderPane();
-        root.setPrefSize(500, 300);
-
-        textArea = new TextArea();
-        textArea.setEditable(false);
-        root.setCenter(textArea);
-
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("WatchServiceExample");
-        primaryStage.show();
-
-        WatchServiceThread wst = new WatchServiceThread();
-        wst.start();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+//    @Override
+//    public void start(Stage primaryStage) throws Exception {
+//        BorderPane root = new BorderPane();
+//        root.setPrefSize(500, 300);
+//
+//        textArea = new TextArea();
+//        textArea.setEditable(false);
+//        root.setCenter(textArea);
+//
+//        Scene scene = new Scene(root);
+//        primaryStage.setScene(scene);
+//        primaryStage.setTitle("WatchServiceExample");
+//        primaryStage.show();
+//
+//        WatchServiceThread wst = new WatchServiceThread();
+//        wst.start();
+//    }
+//
+//    public static void main(String[] args) {
+//        launch(args);
+//    }
 }
 
 
