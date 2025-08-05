@@ -1250,13 +1250,54 @@ public class AutoBoxingUnBoxingExample {
 |boolean bool = Boolean.parseBoolean("true");|
 
 ### 포장 값 비교
-포장 객체는 내부의 값을 비교하기 위해 ==와 != 연산자를 사용할 수 없다. 내부의 값만 비교하려면 언박싱한 값을 얻어 비교해야 한다. 예외로 박싱된 값이 만약 `boolean`과 `char`, `byte`, `short`, `int`라면 `==`와 `!=`연산자로 값을 바로 비교할 수 있다.
+포장 객체는 내부의 값을 비교하기 위해 ==와 != 연산자를 사용할 수 없다. 내부의 값만 비교하려면 언박싱한 값을 얻어 비교해야 한다. 예외로 박싱된 값이 만약 `boolean`과 `char`, `byte`, `short`, `int`라면 타입별로 아래 값의 범위에 한하여 `==`와 `!=`연산자로 값을 바로 비교할 수 있다.
 
-|타입|값의 범위|
-|:---|:---|
-|boolean|true, false|
-|char|\u0000 ~ \u0071|
-|byte, short, int|-128~127|
+|타입| 값의 범위                     |
+|:---|:--------------------------|
+|boolean| true, false               |
+|char| \u0000 ~ \u0071 (0 ~ 127) |
+|byte, short, int| -128~127                  |
+
+> ### ⚠️ 예외적 캐싱
+> 포장 객체 또한 객체이므로, 원칙적으로 연산자 비교를 통해 논리적 동등을 판단할 수 없다. 그러나 Java의 Wrapper 클래스(Integer, Byte, Short, Long, Character) 들은 특정 범위 내의 값에 대해 객체를 캐싱한다. 이로 인해 해당 범위의 값들은 `==` 연산자로 비교해도 true가 나오는 예외적 상황이 발생한다. 이를 흔히 예외적 캐싱 또는 Integer 캐싱이라 부른다.
+> 
+> #### 🔧 Integer 캐싱 예제
+> ```java
+> Integer a = 100;
+> Integer b = 100;
+> System.out.println(a == b);      // ✅ true (캐싱 범위 내)
+>
+> Integer x = 200;
+> Integer y = 200;
+> System.out.println(x == y);      // ❌ false (범위 초과 → 다른 객체)
+> 
+> System.out.println(x.equals(y)); // ✅ true (값 비교이므로 true)
+> ```
+> #### 📌 왜 다르게 나올까?  
+> Integer.valueOf(100)은 내부적으로 캐시에서 Integer 객체를 가져옴  
+> Integer.valueOf(200)은 새로운 객체를 생성
+> 
+> #### 📦 내부 동작 (Java 소스)
+> ```java
+> public static Integer valueOf(int i) {
+>   if (i >= -128 && i <= 127) {
+>       return IntegerCache.cache[i + 128];
+>   }
+>   return new Integer(i);
+> }
+> ```
+> 
+> #### ✅ 캐싱 확장도 가능하다?  
+> 네. IntegerCache의 상한값은 JVM 옵션으로 조정 가능합니다.  
+> ```bash
+>   java -Djava.lang.Integer.IntegerCache.high=512 MyApp
+> ```
+> → 이러면 -128 ~ 512까지 캐싱되어 Integer.valueOf(300) 같은 경우도 캐시됩니다.  
+> 다만 일반적인 상황에서는 이런 설정을 건드릴 필요는 거의 없습니다.
+> 
+> #### ✅ 결론
+> 다만, 실제 업무에서는 이를 활용할 경우 예기치 못한 오류 발생이 가능하므로, 활용을 지양하는것이 좋다.
+
 
 포장객체에 정확히 어떤 값이 저장될 지 모르는 상황이라면 비교연산자를 이용하는것보단 내부 값을 언박싱해서 비교하거나, `equals()`메소드로 내부 값을 비교하는 것이 좋다. 포장 클래스의 `equals()`메소드는 내부의 값을 비교하도록 오버라이딩 되어있다.  
 
