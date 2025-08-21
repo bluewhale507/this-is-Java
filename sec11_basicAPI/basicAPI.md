@@ -847,7 +847,7 @@ public class StringVlaueOfExmaple {
 ```
 
 ### StringTokenizer 클래스
-문자열이 특정 구분자로 연결되어 있을 경우, 구분자를 기준으로 부분 문자열을 분리하기 위해서는 String.split()을 이용하거나, java.util.StringTokenizer 클래스를 이용할 수 있다. spilt()은 정규표현식으로 구분하고, StringTokenizer는 문자로 구분한다.  
+문자열이 특정 구분자로 연결되어 있을 경우, 구분자를 기준으로 부분 문자열을 분리하기 위해서는 String.split()을 이용하거나, java.util.StringTokenizer 클래스를 이용할 수 있다. spilt()은 정규표현식으로 구분하고, StringTokenizer는 문자로 구분한다.  구분자를 (스페이스)로 주면, 연속된 공백은 자동으로 하나로 처리한다.
 
 #### split() 메소드
 > String.split() 메소드는 정규표현식을 구분자로 해서 문자열을 분리한 후, 배열에 저장하고 리턴한다.  
